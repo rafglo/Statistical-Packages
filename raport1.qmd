@@ -1,0 +1,17 @@
+---
+title: "Najlepsze albumy muzyczne"
+subtitle: "wg użytkowników RateYourMusic.com"
+authors: "Bartosz Łuksza, Rafał Głodek"
+---
+
+### Wprowadzenie
+
+Muzyka towarzyszy człowiekowi od tysięcy lat. Zawsze stanowiła nieodłączną część naszej kultury. Niestety ograniczenia technologiczne przez długi czas nie pozwalały artystom utrwalić swoich dzieł. Fonografia narodziła się w XIX wieku, a jej największy rozkwit przypada na drugą połowę wieku XX. Z tego względu najstarsze oryginalne dzieła muzyczne, do których mamy obecnie dostęp pochodzą poprzedniego stulecia. W naszej pracy zajrzymy wgłąb współczesnej historii muzyki i przeanalizujemy najlepiej oceniane albumy muzyczne przez użytkowników RateYourMusic.com - największego portalu do oceniania muzyki w internecie. W jakich latach powstawało najwięcej "dobrych" albumów?Czy istnieje korelacja między średnią oceną użytkowników a datą wydania dzieła?Jakie są średnie średnie ocen dla różnych gatunków muzycznych i sprawdzimy. Którzy artyści wydali najwięcej dobrze ocenianych albumów. Na te i wiele innych pytań odpowiemy w naszej pracy.
+
+```{r, include=False}
+library(tidyverse)
+```
+
+```{r, include=FALSE}
+rym <- read_csv("rym_top_5000_all_time.csv")
+```
