@@ -2,13 +2,43 @@
 title: "Najlepsze albumy muzyczne"
 subtitle: "wg użytkowników RateYourMusic.com"
 authors: "Bartosz Łuksza, Rafał Głodek"
+format: pdf
 ---
 
 ### Wprowadzenie
 
 Muzyka towarzyszy człowiekowi od tysięcy lat. Zawsze stanowiła nieodłączną część naszej kultury. Niestety ograniczenia technologiczne przez długi czas nie pozwalały artystom utrwalić swoich dzieł. Fonografia narodziła się w XIX wieku, a jej największy rozkwit przypada na drugą połowę wieku XX. Z tego względu najstarsze oryginalne dzieła muzyczne, do których mamy obecnie dostęp, pochodzą poprzedniego stulecia. W ostanich latach rynek muzyczny przeżywa niebywały rozwkit. Każdego roku miliardy słuchaczy na całym świecie, przesłuchuje miliony nowych albumów, generując przychody rzędu dziesiątek miliardów dolarów ze sprzedaży nagrań. Rynek muzyczny jest jednak ściśle powiązany z wieloma innymi gałęziami biznesu, takimi jak: film, moda, czy technologie cyfrowe. Szacuje się, że każdego dnia na serwisy streamingowe trafia nawet 120 000 utworów! W tej sytuacji można pokusić się o stwierdzenie, że obecny przemysł muzyczny jest wręcz "przeładowany" muzyką. Warto zadać sobie pytanie, czy za ilością idzie również jakość? 
 
-W naszej pracy zajrzymy wgłąb współczesnej historii muzyki i przeanalizujemy bazę pięciu tysięcy najlepiej ocenianych albumów muzycznych przez użytkowników RateYourMusic.com - największego portalu do oceniania muzyki w internecie. Dane 
+W naszej pracy zajrzymy wgłąb współczesnej historii muzyki i przeanalizujemy bazę pięciu tysięcy najlepiej ocenianych albumów muzycznych przez użytkowników RateYourMusic.com - największego portalu do oceniania muzyki w internecie. Dane pochodzą z 12 grudnia 2021 r. i zostały pobrane z serwisu kaggle.com. Wyodrębniliśmy z nich następujące zmienne:
+
+\begin{enumerate}
+\item \textbf{\textit{Album}} - nazwa albumu
+\begin{itemize}
+\item Zawiera 4928 unikalne wartości
+\end{itemize}
+\item \textbf{\textit{Artist Name}} - artysta (imię i nazwisko lub pseudonim artystyczny)
+\begin{itemize}
+\item Zawiera 2787 unikalne wartości
+\item 25 rekordów to "Various artists", czyli różni artyści, których jednak nie możemy wyodrębnić, więc pomijamy te wartości
+\end{itemize}
+\item \textbf{\texit{Release Date}} - dokładna data wydania albumu (dzień/miesiąc/rok), wyodrębniliśmy z niej dwie zmienne:
+\begin{enumerate}
+\item \textbf{\textit{Year}} - rok wydania albumu
+\begin{itemize}
+\item najmniejsza wartość: 1947
+\item największa wartość: 2021
+\item średnia arytmetyczna: 1987,46
+\item mediana: 1988
+\item wariancja: 253,23
+\end{itemize}
+\item \textbf{\textit{Month}} - miesiąc wydania albumu
+\end{enumerate}
+\item \textbf{\textit{Genres}} - gatunki (lub gatunek), do których należy album
+\begin{itemize}
+\item Niekiedy trudno jest ustalić, do jakiego gatunku należy album. Wówczas określany jest mianem międzygatunkowego i klasyfikuje się go jako przynależnego do każdego z wymienionych gatunków.
+\item Możliwe wartości to: "Rock", "Hip Hop", "
+\end{itemize}
+\end{enumerate}
 
 Dogłębna analiza pozwoli nam znaleźć korelacje między różnymi zmiennymi ujętymi w zestawieniu i wyciągnąć nieoczywiste wnioski. W ten sposób nie tylko dowiemy się, jak muzyka rozwijała się w ubiegłych dekadach, ale także nakreślimy scieżkę jej dalszego rozwoju. 
 
