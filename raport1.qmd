@@ -81,9 +81,30 @@ library(tidyverse)
 ```{r, include=FALSE}
 rym <- read_csv("rym_top_5000_all_time.csv")
 ```
+
 ```{r, include=FALSE}
 rym$Years <- substr(rym$`Release Date`, nchar(rym$`Release Date`) - 3, nchar(rym$`Release Date`))
 ```
+
+```{r}
+library(dplyr)
+library(stringr)
+
+basic_genres <- c("Rock", "Hip Hop", "Pop", "Jazz", "Soul", "Dance", "Techno", "Punk", "Metal", "Folk")
+
+rym <- rym %>%
+  rowwise() %>%
+  mutate(
+    Basic_Genres = list(basic_genres[sapply(basic_genres, function(g) str_detect(Genres, g))])
+  ) %>%
+  ungroup()
+
+rym <- rym %>%
+  mutate(Basic_Genres = sapply(Basic_Genres, function(x) paste(x, collapse = ", ")))
+
+```
+
+
 ```{r, include=FALSE}
 genres <- rym$Genres
 ratings <- rym$`Average Rating`
@@ -92,7 +113,6 @@ genres1 <- c("Rock", "Hip Hop", "Pop", "Jazz", "Soul", "Dance", "Techno", "Punk"
 genres2 <- c()
 ratings2 <- c()
 years2 <- c()
-
 for (i in seq_along(genres)) {
   for (genre1 in genres1) {
     if (grepl(genre1, genres[i], ignore.case = TRUE)) {
@@ -102,6 +122,37 @@ for (i in seq_along(genres)) {
     }
   }
 }
-result <- data.frame(genres2, ratings2, years2)
-print(result)
+data <- data.frame(genres2, ratings2, years2)
+
+split_data <- split(data, data$genres2)
+
+rock_r <- split_data$Rock$ratings2
+rock_y <- split_data$Rock$years2
+hiphop_r <- split_data$'Hip Hop'$ratings2
+hiphop_y <- split_data$'Hip Hop'$years2
+pop_r <- split_data$Pop$ratings2
+pop_y <- split_data$Pop$years2
+jazz_r <- split_data$Jazz$ratings2
+jazz_y <- split_data$Jazz$years2
+soul_r <- split_data$Soul$ratings2
+soul_y <- split_data$Soul$years2
+dance_r <- split_data$Dance$ratings2
+dance_y <- split_data$Dance$years2
+techno_r <- split_data$Techno$ratings2
+techno_y <- split_data$Techno$years2
+punk_r <- split_data$Punk$ratings2
+punk_y <- split_data$Punk$years2
+metal_r <- split_data$Metal$ratings2
+metal_y <- split_data$Metal$years2
+folk_r <- split_data$Folk$ratings2
+folk_y <- split_data$Folk$years2
+```
+```{r}
+library(ggplot2)
+```
+```{r}
+ggplot() +
+  geom_point(aes(x = rock_y, y = rock_r), color = "red", shape = 1) +
+  labs(x = "Year", y = "Rating", title = "Music Ratings by Genre") +
+  theme_minimal()
 ```
