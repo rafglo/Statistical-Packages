@@ -83,7 +83,9 @@ rym <- read_csv("rym_top_5000_all_time.csv")
 ```
 
 ```{r, include=FALSE}
-rym$Years <- substr(rym$`Release Date`, nchar(rym$`Release Date`) - 3, nchar(rym$`Release Date`))
+rym$Years <- substr(rym$`Release Date`, nchar(rym$`Release Date`) - 3,
+nchar(rym$`Release Date`))
+rym$Years<- as.numeric(as.character(rym$Years))
 ```
 
 ```{r}
@@ -104,11 +106,38 @@ rym <- rym %>%
 
 ```
 
-
-```{r, include=FALSE}
-genres <- rym$Genres
+```{r, include =  FALSE}
+genres <- rym$'Basic_Genres'
 ratings <- rym$`Average Rating`
 years <- rym$Years
+```
+
+```{r}
+library(ggplot2)
+ggplot(rym, aes(x=`Average Rating`,y=after_stat(density))) +
+  geom_histogram(bins=40, fill="pink", col="black") +
+  geom_density(aes(x=`Average Rating`, y =after_stat(density)), col="black")+
+  ggtitle("Histogram gęstości dla średnich ocen")
+```
+```{r}
+ggplot(rym, aes(x=Years,y=after_stat(density))) +
+  geom_histogram(bins=30, fill="pink", col="black") +
+  geom_density(aes(x=Years, y =after_stat(density)), col="black")+
+  ggtitle("Histogram gęstości dla średnich ocen")
+```
+```{r}
+ggplot(rym, aes(x=`Average Rating`)) +
+  stat_ecdf(geom="step") +
+  ggtitle("Dystrybuanta empiryczna dla lat wydania albumów")
+```
+```{r}
+ggplot(rym, aes(x=Years)) +
+  stat_ecdf(geom="step") +
+  ggtitle("Dystrybuanta empiryczna dla lat wydania albumów")
+```
+
+
+```{r, include=FALSE}
 genres1 <- c("Rock", "Hip Hop", "Pop", "Jazz", "Soul", "Dance", "Techno", "Punk", "Metal", "Folk")
 genres2 <- c()
 ratings2 <- c()
