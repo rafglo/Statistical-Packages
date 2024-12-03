@@ -215,6 +215,44 @@ ggplot(genre_counts_df, aes(x = reorder(Genre, Count), y = Count, fill = Genre))
         plot.title = element_text(hjust = 0.5, size = 14, face = "bold")) + 
   guides(fill = "none") 
 ```
+```{r, echo=FALSE}
+library("ggpattern")
+filtered_data <- rym %>%
+  filter(`Artist Name` != "Various Artists")
+
+artist_counts <- filtered_data %>%
+  group_by(`Artist Name`) %>%
+  summarise(Count = n()) %>%
+  arrange(desc(Count)) %>%
+  head(10)
+
+ggplot(artist_counts, aes(x = reorder(`Artist Name`, Count), y = Count)) +
+  geom_bar_pattern(
+    stat = "identity",
+    aes(pattern = "stripe"),
+    fill = "skyblue",
+    color = "pink",
+    pattern_fill = "pink",
+    pattern_angle = 45,
+    pattern_density = 0.2,
+    pattern_spacing = 0.03 ) +
+  geom_text(aes(label = Count), color = "black", size = 4, hjust = -0.2) +
+  coord_flip() +
+  labs(
+    title = "10 najlepiej ocenianych artystów",
+    x = "Nazwa artysty",
+    y = "Liczba albumów"
+  ) +
+  theme_minimal() +
+  theme(
+    panel.background = element_rect(fill = "snow"),
+    panel.grid.major.x = element_blank(),
+    panel.grid.major.y = element_blank(),
+    axis.text.y = element_text(size = 10),
+    axis.text.x = element_text(size = 10),
+    legend.position = "none")
+
+```
 
 
 ```{r,include=FALSE}
