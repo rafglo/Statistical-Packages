@@ -105,6 +105,8 @@ rym <- rym %>%
 rym <- rym %>%
   mutate(Basic_Genres = sapply(Basic_Genres, function(x) paste(x, collapse = ", ")))
 
+rym <- rym %>% filter(!is.na(Basic_Genres))
+
 ```
 
 ```{r, include =  FALSE}
@@ -161,13 +163,19 @@ ggplot(rym, aes(x=years_name,y=years)) +
     ggtitle("Wykres pudełkowy dla lat wydania albumów") +
     xlab("")
 ```
-```{r, echo=FALSE}
+```{r, include=FALSE}
 boxplot_df = data.frame(ratings, years, num_of_ratings, num_of_reviews)
 Summary<-boxplot(boxplot_df)$stats
+```
+
+
+```{r,echo=FALSE}
 colnames(Summary)<-c("Ratings","Years","Number of Ratings", "Number of Reviews")
 rownames(Summary)<-c("Min","First Quartile","Median","Third Quartile","Maximum")
 Summary
 ```
+
+
 ```{r,ECHO=FALSE}
 lm_ratings_and_years = lm(ratings~years)
 summary(lm_ratings_and_years)
@@ -178,9 +186,38 @@ ggplot(rym, aes(x=Years, y=`Average Rating`)) +
   geom_smooth(method='lm', color="darkmagenta", linewidth = 0.7)+
   ggtitle("Regresja liniowa Average_Ratings~Years")
 ```
+```{r,echo=FALSE}
+genre_counts <- sapply(basic_genres, function(genre) {
+  sum(grepl(genre, rym$Basic_Genres, ignore.case = TRUE))
+})
+
+genre_counts_df <- data.frame(
+  Genre = names(genre_counts),
+  Count = genre_counts
+)
+
+genre_counts_df <- genre_counts_df %>%
+  arrange(desc(Count))
+
+colors <- c("#ADD8E6", "#FFDAB9", "#90EE90", "#FFB6C1", "#FFE4B5", 
+                   "#D3D3D3", "#B0E0E6", "#E6E6FA", "#FFFACD", "#F5DEB3")
+
+ggplot(genre_counts_df, aes(x = reorder(Genre, Count), y = Count, fill = Genre)) +
+  geom_bar(stat = "identity", color = "black", width = 0.7) + 
+  scale_fill_manual(values = colors) + 
+  theme_minimal() +
+  labs(title = "Histogram liczności gatunków",
+       x = "Gatunek",
+       y = "Liczba albumów") +
+  theme(axis.text.x = element_text(hjust = 0.5, size = 10, color = "black"), 
+        axis.title.x = element_text(margin = margin(t = 10)), 
+        axis.text.y = element_text(size = 10, color = "black"),
+        plot.title = element_text(hjust = 0.5, size = 14, face = "bold")) + 
+  guides(fill = "none") 
+```
 
 
-```{r, include=FALSE}
+```{r,include=FALSE}
 genres1 <- c("Rock", "Hip Hop", "Pop", "Jazz", "Soul", "Dance", "Techno", "Punk", "Metal", "Folk")
 genres2 <- c()
 ratings2 <- c()
@@ -218,13 +255,10 @@ metal_r <- split_data$Metal$ratings2
 metal_y <- split_data$Metal$years2
 folk_r <- split_data$Folk$ratings2
 folk_y <- split_data$Folk$years2
-```
-```{r}
-library(ggplot2)
-```
-```{r}
+
 ggplot() +
   geom_point(aes(x = rock_y, y = rock_r), color = "red", shape = 1) +
   labs(x = "Year", y = "Rating", title = "Music Ratings by Genre") +
   theme_minimal()
+
 ```
