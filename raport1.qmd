@@ -57,17 +57,17 @@ W naszej pracy zajrzymy wgłąb współczesnej historii muzyki i przeanalizujemy
 \begin{itemize}
 \item najmniejsza wartość: 260
 \item największa wartość: 70 400
-\item średnia arytmetyczna: 3,771
-\item mediana: 3,75
-\item wariancja: 0,0098
+\item średnia arytmetyczna: 4084.511
+\item mediana: 1820
+\item wariancja: 36016085
 \end{itemize}
 \item \textbf{\textit{Number of Reviews}} - liczba recenzji użytkowników
 \begin{itemize}
 \item najmniejsza wartość: 0
 \item największa wartość: 1 549
-\item średnia arytmetyczna: 3,771
-\item mediana: 3,75
-\item wariancja: 0,0098
+\item średnia arytmetyczna: 71.4492
+\item mediana: 34
+\item wariancja: 11766.56
 \end{itemize}
 \end{enumerate}
 
@@ -86,9 +86,10 @@ rym <- read_csv("rym_top_5000_all_time.csv")
 rym$Years <- substr(rym$`Release Date`, nchar(rym$`Release Date`) - 3,
 nchar(rym$`Release Date`))
 rym$Years<- as.numeric(as.character(rym$Years))
+rym$`Average Rating` <- as.numeric(rym$`Average Rating`)
 ```
 
-```{r}
+```{r, include = FALSE}
 library(dplyr)
 library(stringr)
 
@@ -110,30 +111,72 @@ rym <- rym %>%
 genres <- rym$'Basic_Genres'
 ratings <- rym$`Average Rating`
 years <- rym$Years
+num_of_ratings <- rym$`Number of Ratings`
+num_of_reviews <- rym$`Number of Reviews`
+ratings_name <- factor(c(rep("Ratings", 5000)))
+years_name <- factor(c(rep("Years", 5000)))
+print(mean(num_of_reviews))
 ```
 
-```{r}
+```{r,echo=FALSE}
 library(ggplot2)
 ggplot(rym, aes(x=`Average Rating`,y=after_stat(density))) +
   geom_histogram(bins=40, fill="pink", col="black") +
   geom_density(aes(x=`Average Rating`, y =after_stat(density)), col="black")+
   ggtitle("Histogram gęstości dla średnich ocen")
 ```
-```{r}
+```{r, echo=FALSE}
 ggplot(rym, aes(x=Years,y=after_stat(density))) +
   geom_histogram(bins=30, fill="pink", col="black") +
   geom_density(aes(x=Years, y =after_stat(density)), col="black")+
   ggtitle("Histogram gęstości dla średnich ocen")
 ```
-```{r}
+```{r echo=FALSE}
 ggplot(rym, aes(x=`Average Rating`)) +
   stat_ecdf(geom="step") +
   ggtitle("Dystrybuanta empiryczna dla lat wydania albumów")
 ```
-```{r}
+```{r,echo=FALSE}
 ggplot(rym, aes(x=Years)) +
   stat_ecdf(geom="step") +
   ggtitle("Dystrybuanta empiryczna dla lat wydania albumów")
+```
+```{r, echo=FALSE}
+library(hrbrthemes)
+library(viridis)
+ggplot(rym, aes(x=ratings_name,y=ratings)) +
+    geom_boxplot() +
+    scale_fill_viridis(discrete=TRUE,alpha=0) +
+    geom_jitter(color="red", size=0.4, alpha=0.3) +
+    ggtitle("Wykres pudełkowy średnich ocen") +
+    xlab("")
+```
+```{r, echo=FALSE}
+library(hrbrthemes)
+library(viridis)
+ggplot(rym, aes(x=years_name,y=years)) +
+    geom_boxplot() +
+    scale_fill_viridis(discrete=TRUE,alpha=0) +
+    geom_jitter(color="blue", size=0.4, alpha=0.3) +
+    ggtitle("Wykres pudełkowy dla lat wydania albumów") +
+    xlab("")
+```
+```{r, echo=FALSE}
+boxplot_df = data.frame(ratings, years, num_of_ratings, num_of_reviews)
+Summary<-boxplot(boxplot_df)$stats
+colnames(Summary)<-c("Ratings","Years","Number of Ratings", "Number of Reviews")
+rownames(Summary)<-c("Min","First Quartile","Median","Third Quartile","Maximum")
+Summary
+```
+```{r,ECHO=FALSE}
+lm_ratings_and_years = lm(ratings~years)
+summary(lm_ratings_and_years)
+```
+```{r, echo=FALSE}
+ggplot(rym, aes(x=Years, y=`Average Rating`)) +
+  geom_jitter(color="plum", size=0.8, alpha=0.8) + 
+  geom_smooth(method='lm', color="darkmagenta", linewidth = 0.7)+
+  ggtitle("Regresja liniowa Average_Ratings~Years")
 ```
 
 
