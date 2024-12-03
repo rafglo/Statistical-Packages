@@ -19,9 +19,9 @@ W naszej pracy zajrzymy wgłąb współczesnej historii muzyki i przeanalizujemy
 \item \textbf{\textit{Artist Name}} - artysta (imię i nazwisko lub pseudonim artystyczny)
 \begin{itemize}
 \item Zawiera 2787 unikalne wartości
-\item 25 rekordów to "Various artists", czyli różni artyści, których jednak nie możemy wyodrębnić, więc pomijamy te wartości
+\item 25 rekordów to \textit{Various Artists}, czyli różni artyści, których jednak nie możemy wyodrębnić, więc pomijamy te wartości
 \end{itemize}
-\item \textbf{\texit{Release Date}} - dokładna data wydania albumu (dzień/miesiąc/rok), wyodrębniliśmy z niej dwie zmienne:
+\item \textbf{\textit{Release Date}} - dokładna data wydania albumu (dzień/miesiąc/rok), wyodrębniliśmy z niej dwie zmienne:
 \begin{enumerate}
 \item \textbf{\textit{Year}} - rok wydania albumu
 \begin{itemize}
@@ -36,7 +36,38 @@ W naszej pracy zajrzymy wgłąb współczesnej historii muzyki i przeanalizujemy
 \item \textbf{\textit{Genres}} - gatunki (lub gatunek), do których należy album
 \begin{itemize}
 \item Niekiedy trudno jest ustalić, do jakiego gatunku należy album. Wówczas określany jest mianem międzygatunkowego i klasyfikuje się go jako przynależnego do każdego z wymienionych gatunków.
-\item Możliwe wartości to: "Rock", "Hip Hop", "
+\item Możliwe wartości to: "Rock", "Hip Hop", "Pop" , "Jazz", "Soul", "Dance", "Techno", "Punk", "Metal", "Folk"
+\end{itemize}
+\item \textbf{\textit{Descriptors}} - krótki opis albumu
+\begin{itemize}
+\item Opis zawiera kilka przymiotników najlepiej oddających charakter albumu, np. "melancholic, anxious, futuristic, alienation, existential, male vocals, atmospheric, lonely, cold, introspective"
+\item Opisy będą potrzebne, by sprawdzić jak oceniane są albumy w zależności od nastroju, jaki wywołują w słuchaczu
+\end{itemize}
+\item \textbf{\textit{Average Rating}} - średnia ocen użytkowników
+\begin{itemize}
+\item Na stronie RateYourMusic.com użytkownicy mogą wystawiać albumom oceny w skali od 0 do 5, z uwzględnieniem "połówek"
+\item Średnie oceny, które są brane pod uwagę w tym spisie uwzględniają także wagi ocen - oceny użytkowników wykazujących się dużą aktywnością i doświadczeniem mają wyższą wagę niż tych, którzy oceniają muzykę sporadycznie
+\item najmniejsza wartość: 3,52
+\item największa wartość: 4,34
+\item średnia arytmetyczna: 3,771
+\item mediana: 3,75
+\item wariancja: 0,0098
+\end{itemize}
+\item \textbf{\textit{Number of Ratings}} - liczba ocen użytkowników
+\begin{itemize}
+\item najmniejsza wartość: 260
+\item największa wartość: 70 400
+\item średnia arytmetyczna: 3,771
+\item mediana: 3,75
+\item wariancja: 0,0098
+\end{itemize}
+\item \textbf{\textit{Number of Reviews}} - liczba recenzji użytkowników
+\begin{itemize}
+\item najmniejsza wartość: 0
+\item największa wartość: 1 549
+\item średnia arytmetyczna: 3,771
+\item mediana: 3,75
+\item wariancja: 0,0098
 \end{itemize}
 \end{enumerate}
 
@@ -49,4 +80,28 @@ library(tidyverse)
 
 ```{r, include=FALSE}
 rym <- read_csv("rym_top_5000_all_time.csv")
+```
+```{r, include=FALSE}
+rym$Years <- substr(rym$`Release Date`, nchar(rym$`Release Date`) - 3, nchar(rym$`Release Date`))
+```
+```{r, include=FALSE}
+genres <- rym$Genres
+ratings <- rym$`Average Rating`
+years <- rym$Years
+genres1 <- c("Rock", "Hip Hop", "Pop", "Jazz", "Soul", "Dance", "Techno", "Punk", "Metal", "Folk")
+genres2 <- c()
+ratings2 <- c()
+years2 <- c()
+
+for (i in seq_along(genres)) {
+  for (genre1 in genres1) {
+    if (grepl(genre1, genres[i], ignore.case = TRUE)) {
+      genres2 <- c(genres2, genre1)
+      ratings2 <- c(ratings2, ratings[i])
+      years2 <- c(years2, years[i])
+    }
+  }
+}
+result <- data.frame(genres2, ratings2, years2)
+print(result)
 ```
