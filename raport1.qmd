@@ -189,23 +189,29 @@ Znów wykorzystamy funkcję \texttt{$boxplot.stats$} i wyliczymy parametry tego 
 \end{tabular}
 \end{center}
 
-Wyciągnijmy teraz wnioski z tabeli i wykresu. 
+Wyciągnijmy teraz wnioski z tabeli i wykresu. Zauważmy, że wąsy górne i dolne pokrywają się z minimum i maksimum lat wydania albumów. Z tego powodu w rozważanym zbiorze nie występują żadne wartości odstające. Średnia arytmetyczna niemalże pokrywa się z medianą, więc rozkład lat będzie przypominał rozkład symetryczny. Największe zagęszczenie danych występuje między 1973 a 2000 rokiem, czyli między pierwszym a czwartym kwartylem. Oznacza to, że aż 50% wszystkich albumów zakwalifikowanych do rankingu zostało wydanych w okresie tych 27 lat, a w całym zestawieniu rozważamy przedział 74 lat. Można zatem stwierdzić, że najwięcej wysoko ocenianych albumów zostało wydanych w latach 70., 80. i 90. XX wieku.
 
-Dla każdej z tych zmiennych stworzymy histogram prawdopodobieństwa za pomocą funkcji \texttt{$geom_histogram$} i dopasujemy do niego jądrowy estymator gęstości używając \texttt{$geom_density$}. Wynik dla średnich ocen prezentuje się następująco
+W następnym kroku dla każdej z rozważanych zmiennych wygenerujemy histogram prawdopodobieństwa \texttt{$geom\_histogram$} i dopasujemy do niego jądrowy estymator gęstości używając \texttt{$geom\_density$}. Wynik dla średnich ocen prezentuje się następująco
 
 ```{r,echo=FALSE}
 library(ggplot2)
 ggplot(rym, aes(x=`Average Rating`,y=after_stat(density))) +
-  geom_histogram(bins=40, fill="pink", col="black") +
-  geom_density(aes(x=`Average Rating`, y =after_stat(density)), col="black")+
+  geom_histogram(bins=40, fill="red", col="darkred", alpha=0.5) +
+  geom_density(aes(x=`Average Rating`, y =after_stat(density)), col="black", linewidth=0.6)+
   ggtitle("Histogram gęstości dla średnich ocen")
 ```
+Na bazie wykresu możemy stwierdzić, że oceny użytkowników mają rozkład prawostronnie skośny, z pojedynczą górką (modą) znajdującą się w okolicach punktu 3.7, co sugeruje, że większość albumów uzyskuje taką ocenę. Gęstość empiryczna zaczyna gwałtownie maleć w okolicach punktu 4.1, co potwierdza wniosek wyciągnięty na bazie wykresu pudełkowego - takie oceny są bardzo rzadkie, bowiem charakteryzują jedynie ścisłą czołówkę albumów. Rozkład ten swoim kształtem nieco przypomina rozkład normalny, lecz występuje tu wyraźna asymetria, świadcząca o jego skośności z prawej strony. Można zatem potwierdzić wcześniejszą obserwację, że oceny najczęściej pojawiające się w naszym zestawieniu, znajdują się w przedziale od umiarkowanych do nieco poniżej średniej. 
+
+Następnie wygenerujemy analogiczny wykres dla lat wydania albumów.
+
 ```{r, echo=FALSE}
 ggplot(rym, aes(x=Years,y=after_stat(density))) +
-  geom_histogram(bins=30, fill="pink", col="black") +
-  geom_density(aes(x=Years, y =after_stat(density)), col="black")+
+  geom_histogram(bins=30, fill="blue", col="darkblue", alpha=0.5) +
+  geom_density(aes(x=Years, y =after_stat(density)), col="black", linewidth=0.6)+
   ggtitle("Histogram gęstości dla lat wydania albumów")
 ```
+Rozkład lat wydania albumów ma nieco bardziej skomplikowaną naturę. Można go zaklasyfikować jako dwumodalny, czyli posiadający dwa wyraźne punkty skupienia. Pierwszy wierzchołek tego rozkładu znajduje się w okolicy lat 70., gdy światem muzyki zawładnęły gatunki, takie jak rock, metal i disco. Kolejny szczyt widoczny jest na przełomie lat 90. i 2000., kiedy na światowych scenach dominowały: pop, grunge oraz przede wszystkim - hip hop. Poza tymi okresami występowały znaczące spadki w liczbie dobrze ocenianych albumów. Szokującym może być fakt, że w obecnych czasach obserwowany jest największy spadek jakościowej muzyki od lat 50 z tym, że wtedy wydawano znacznie mniej albumów w porównaniu do dzisiejszych czasów. Warto więc zastanowić się nad pytaniem, czy w czasach współczesnych, pomimo szerokiej dostępności muzyki oraz ogromnych pieniędzy wydawanych na jej produkcję i dystrybucję, stoimy w obliczu największego kryzysu muzycznego?
+
 ```{r,include=FALSE}
 ggplot(rym, aes(x=`Number of Ratings`,y=after_stat(density))) +
   geom_histogram(bins=40, fill="pink", col="black") +
