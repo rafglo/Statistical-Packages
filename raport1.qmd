@@ -5,7 +5,7 @@ authors: "Bartosz Łuksza, Rafał Głodek"
 format: pdf
 ---
 
-### Wprowadzenie
+\section{Wprowadzenie}
 
 Muzyka towarzyszy człowiekowi od tysięcy lat. Zawsze stanowiła nieodłączną część naszej kultury. Niestety ograniczenia technologiczne przez długi czas nie pozwalały artystom utrwalić swoich dzieł. Fonografia narodziła się w XIX wieku, a jej największy rozkwit przypada na drugą połowę wieku XX. Z tego względu najstarsze oryginalne dzieła muzyczne, do których mamy obecnie dostęp, pochodzą poprzedniego stulecia. W ostanich latach rynek muzyczny przeżywa niebywały rozwkit. Każdego roku miliardy słuchaczy na całym świecie, przesłuchuje miliony nowych albumów, generując przychody rzędu dziesiątek miliardów dolarów ze sprzedaży nagrań. Rynek muzyczny jest jednak ściśle powiązany z wieloma innymi gałęziami biznesu, takimi jak: film, moda, czy technologie cyfrowe. Szacuje się, że każdego dnia na serwisy streamingowe trafia nawet 120 000 utworów! W tej sytuacji można pokusić się o stwierdzenie, że obecny przemysł muzyczny jest wręcz "przeładowany" muzyką. Warto zadać sobie pytanie, czy za ilością idzie również jakość? 
 
@@ -74,6 +74,8 @@ W naszej pracy zajrzymy wgłąb współczesnej historii muzyki i przeanalizujemy
 Dogłębna analiza pozwoli nam znaleźć korelacje między różnymi zmiennymi ujętymi w zestawieniu i wyciągnąć nieoczywiste wnioski. W ten sposób nie tylko dowiemy się, jak muzyka rozwijała się w ubiegłych dekadach, ale także nakreślimy scieżkę jej dalszego rozwoju. 
 
 W jakich latach powstawało najwięcej "dobrych" albumów? Czy istnieje korelacja między średnią oceną użytkowników a datą wydania dzieła? Jakie są średnie ocen dla różnych gatunków muzycznych? Którzy artyści mogą się poszczycić najlepiej ocenianią dyskografią? Na te i wiele innych pytań odpowiemy w naszej pracy.
+
+\section{Analiza danych}
 ```{r, include=FALSE}
 library(tidyverse)
 ```
@@ -119,6 +121,77 @@ ratings_name <- factor(c(rep("Ratings", 5000)))
 years_name <- factor(c(rep("Years", 5000)))
 print(mean(num_of_reviews))
 ```
+\subsection{Analiza rozkładów lat oraz średnich ocen}
+W pierwszej części naszej analizy zbadamy, jak rozkładają się średnie ocen wystawionych przez użytkowników oraz lata wydania albumów. Zaczniemy od wygenerowania wykresów pudełkowych dla każdej z nich oraz wyliczenia jego parametrów - mediany, pierwszego i trzeciego kwartyla, rozstępu międzykwartylowego oraz górnego i dolnego wąsa. Ponadto na wykres pudełkowy nałożymy także realizację naszej zmiennej w postaci punktów oraz jej średnią arytmetyczną. 
+
+Wykres pudełkowy dla średnich ocen prezentuje się następująco
+
+
+```{r, echo=FALSE}
+library(hrbrthemes)
+library(viridis)
+ggplot(rym, aes(x=ratings_name,y=ratings)) +
+    geom_boxplot() +
+    scale_fill_viridis(discrete=TRUE,alpha=0) +
+    geom_jitter(color="red", size=0.4, alpha=0.2) +
+    geom_hline(yintercept=mean(rym$`Average Rating`), linetype="dashed", color = "darkred") +
+    ggtitle("Wykres pudełkowy średnich ocen") +
+    theme(plot.title = element_text(hjust = 0.5)) +
+    xlab("")
+```
+Korzystając z funkcji \texttt{$boxplot.stats$} wydobędziemy z wykresu najważniejsze dane. Przedstawimy je w formie tabeli
+
+\begin{center}
+\begin{tabular}{ |c|c| } 
+ \hline
+ Wąs dolny & $3.54$ \\ 
+ \hline
+ Pierwszy kwartyl & $3.70$\\ 
+ \hline
+ Mediana & $3.75$\\ 
+ \hline
+ Trzeci kwartyl & $3.81$\\ 
+ \hline
+ Wąs górny & $3.97$\\ 
+ \hline
+\end{tabular}
+\end{center}
+
+Na bazie wykresu oraz tabeli możemy wyciągnąć kilka istotnych wniosków. Zgodnie z ideą wykresu pudełkoweg, zdecydowana większość punktów znajduje się w przedziale między wąsem dolnym a wąsem górnym, czyli $(3.54, 3.97)$. Obserwacje wypadające z niego możemy uznać za odstające. Jeden punkt znajduje się pod wąsem dolnym, natomiast możemy odnaleźć dużo więcej punktów osadzonych ponad wąsem górnym. W kontekście tematyki naszej pracy, możemy interpretować je jako ścisłą czołówkę albumów. Średnia arytmetyczna, będąca nieobciążonym estymatorem wartości oczekiwanej, jest większa niż mediana, a zatem mamy w tym przypadku do czynienia z rozkładem prawoskośnym. Oznacza to dla nas, że wyniki poniżej średniej są w naszej próbce przeważające. Oceny znacznie odbiegające od średniej są zatem dużą rzadkością i tym samym czołówka rankingu zarysowuje się nam coraz mocniej.
+
+Teraz przeprowadzimy analogiczną analizę dla lat wydania albumów. Wygenerujmy dla danych wykres pudełkowy
+
+```{r,echo=FALSE}
+ggplot(rym, aes(x=years_name,y=years)) +
+    geom_boxplot() +
+    scale_fill_viridis(discrete=TRUE,alpha=0) +
+    geom_jitter(color="blue", size=0.4, alpha=0.3) +
+    geom_hline(yintercept=mean(rym$`Years`), linetype="dashed", color = "darkblue") +
+    ggtitle("Wykres pudełkowy dla lat wydania albumów") +
+    theme(plot.title = element_text(hjust = 0.5))+
+    xlab("")
+```
+Znów wykorzystamy funkcję \texttt{$boxplot.stats$} i wyliczymy parametry tego wykresu pudełkowego. Zawiera je poniższa tabela.
+
+\begin{center}
+\begin{tabular}{ |c|c| } 
+ \hline
+ Wąs dolny & $1947$ \\ 
+ \hline
+ Pierwszy kwartyl & $1973$\\ 
+ \hline
+ Mediana & $1988$\\ 
+ \hline
+ Trzeci kwartyl & $2000$\\ 
+ \hline
+ Wąs górny & $2021$\\ 
+ \hline
+\end{tabular}
+\end{center}
+
+Wyciągnijmy teraz wnioski z tabeli i wykresu. 
+
+Dla każdej z tych zmiennych stworzymy histogram prawdopodobieństwa za pomocą funkcji \texttt{$geom_histogram$} i dopasujemy do niego jądrowy estymator gęstości używając \texttt{$geom_density$}. Wynik dla średnich ocen prezentuje się następująco
 
 ```{r,echo=FALSE}
 library(ggplot2)
@@ -131,8 +204,15 @@ ggplot(rym, aes(x=`Average Rating`,y=after_stat(density))) +
 ggplot(rym, aes(x=Years,y=after_stat(density))) +
   geom_histogram(bins=30, fill="pink", col="black") +
   geom_density(aes(x=Years, y =after_stat(density)), col="black")+
-  ggtitle("Histogram gęstości dla średnich ocen")
+  ggtitle("Histogram gęstości dla lat wydania albumów")
 ```
+```{r,include=FALSE}
+ggplot(rym, aes(x=`Number of Ratings`,y=after_stat(density))) +
+  geom_histogram(bins=40, fill="pink", col="black") +
+  geom_density(aes(x=`Number of Ratings`, y =after_stat(density)), col="black")+
+  ggtitle("Histogram gęstości dla liczby ocen")
+```
+
 ```{r echo=FALSE}
 ggplot(rym, aes(x=`Average Rating`)) +
   stat_ecdf(geom="step") +
@@ -143,26 +223,8 @@ ggplot(rym, aes(x=Years)) +
   stat_ecdf(geom="step") +
   ggtitle("Dystrybuanta empiryczna dla lat wydania albumów")
 ```
-```{r, echo=FALSE}
-library(hrbrthemes)
-library(viridis)
-ggplot(rym, aes(x=ratings_name,y=ratings)) +
-    geom_boxplot() +
-    scale_fill_viridis(discrete=TRUE,alpha=0) +
-    geom_jitter(color="red", size=0.4, alpha=0.3) +
-    ggtitle("Wykres pudełkowy średnich ocen") +
-    xlab("")
-```
-```{r, echo=FALSE}
-library(hrbrthemes)
-library(viridis)
-ggplot(rym, aes(x=years_name,y=years)) +
-    geom_boxplot() +
-    scale_fill_viridis(discrete=TRUE,alpha=0) +
-    geom_jitter(color="blue", size=0.4, alpha=0.3) +
-    ggtitle("Wykres pudełkowy dla lat wydania albumów") +
-    xlab("")
-```
+
+
 ```{r, include=FALSE}
 boxplot_df = data.frame(ratings, years, num_of_ratings, num_of_reviews)
 Summary<-boxplot(boxplot_df)$stats
@@ -252,6 +314,75 @@ ggplot(artist_counts, aes(x = reorder(`Artist Name`, Count), y = Count)) +
     axis.text.x = element_text(size = 10),
     legend.position = "none")
 
+```
+```{r}
+# Zakładamy, że `rym` to Twoja ramka danych
+filtered_data <- rym %>%
+  filter(!is.na(Years) & !is.na(`Average Rating`))  # Użycie backticków dla nazw kolumn ze spacjami
+
+ggplot(filtered_data, aes(x = Years, y = as.numeric(`Average Rating`))) +
+  geom_bin2d(bins = 40) +  # Więcej binów dla większej szczegółowości
+  scale_fill_gradient(low = "#56B1F7", high = "#132B43", name = "Liczba albumów") +
+  labs(
+    title = "Dystrybucja albumów: Rok wydania vs Średnia ocena",
+    x = "Rok wydania",
+    y = "Średnia ocena",
+    fill = "Liczba albumów"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+    axis.title = element_text(size = 14),
+    axis.text = element_text(size = 12),
+    legend.title = element_text(size = 12),
+    legend.text = element_text(size = 10),
+    panel.grid.major = element_blank(),  # Usunięcie siatki dla czystszej wizualizacji
+    panel.grid.minor = element_blank()
+  ) +
+  scale_x_continuous(
+    breaks = seq(min(filtered_data$Years, na.rm = TRUE), max(filtered_data$Years, na.rm = TRUE), by = 10),
+    expand = c(0, 0)
+  ) +
+  scale_y_continuous(expand = c(0, 0))
+```
+
+```{r}
+rym <- rym %>%
+  rowwise() %>%
+  mutate(
+    Basic_Genres_List = list(basic_genres[sapply(basic_genres, function(g) grepl(g, Genres, ignore.case = TRUE))])
+  ) %>%
+  ungroup()
+
+# Wybieramy tylko jeden gatunek (pierwszy z listy, jeśli istnieje)
+rym <- rym %>%
+  mutate(
+    Basic_Genres = sapply(Basic_Genres_List, function(x) if (length(x) > 0) x[1] else NA)
+  ) %>%
+  filter(!is.na(Basic_Genres))
+
+# Wybór najlepszego albumu dla każdego roku
+best_album_per_year <- rym %>%
+  group_by(Years) %>%
+  filter("Average Rating" == max("Average Rating", na.rm = TRUE)) %>%
+  slice_sample(n = 1) %>% # Losowy wybór w przypadku remisu
+  ungroup()
+
+# Wizualizacja najlepszego gatunku w każdym roku
+ggplot(best_album_per_year, aes(x = Years, y = Basic_Genres, color = Basic_Genres)) +
+  geom_point(size = 4, alpha = 0.6) +
+  scale_color_viridis_d() +
+  labs(
+    title = "Gatunek najlepiej ocenianego albumu w poszczególnych latach",
+    x = "Rok wydania",
+    y = "Gatunek",
+    color = "Gatunek"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "bottom"
+  )
 ```
 
 
