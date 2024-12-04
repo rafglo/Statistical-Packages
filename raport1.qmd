@@ -219,6 +219,8 @@ ggplot(rym, aes(x=`Number of Ratings`,y=after_stat(density))) +
   ggtitle("Histogram gęstości dla liczby ocen")
 ```
 
+
+
 ```{r echo=FALSE}
 ggplot(rym, aes(x=`Average Rating`)) +
   stat_ecdf(geom="step") +
@@ -324,7 +326,7 @@ ggplot(artist_counts, aes(x = reorder(`Artist Name`, Count), y = Count)) +
 
 ```
 
-```{r}
+```{r,echo=FALSE}
 filtered_data <- rym %>%
   filter(!is.na(Years) & !is.na(`Average Rating`))  # Użycie backticków dla nazw kolumn ze spacjami
 
@@ -354,7 +356,7 @@ ggplot(filtered_data, aes(x = Years, y = as.numeric(`Average Rating`))) +
   scale_y_continuous(expand = c(0, 0))
 ```
 
-```{r}
+```{r, echo=FALSE}
 rym <- rym %>%
   rowwise() %>%
   mutate(
@@ -394,7 +396,7 @@ ggplot(best_album_per_year, aes(x = Years, y = Basic_Genres, color = Basic_Genre
 ```
 
 
-```{r,include=FALSE}
+```{r,echo=FALSE}
 genres1 <- c("Rock", "Hip Hop", "Pop", "Jazz", "Soul", "Dance", "Techno", "Punk", "Metal", "Folk")
 genres2 <- c()
 ratings2 <- c()
@@ -440,7 +442,7 @@ ggplot() +
 
 ```
 
-```{r}
+```{r,echo=FALSE}
 library(dplyr)
 library(ggplot2)
 
@@ -508,7 +510,7 @@ ggplot(final_data, aes(x = reorder(Genre, -Range))) +
   scale_color_manual(values = "red", name = "")
 
 ```
-```{r}
+```{r,echo=FALSE}
 library(dplyr)
 library(ggplot2)
 
@@ -590,4 +592,57 @@ ggplot(daxpp, aes(x = `Number of Ratings`, y = as.numeric(`Average Rating`))) +
   )
 
 ```
+```{r}
+# Definicja podstawowych gatunków
+library(dplyr)
+library(tidyr)
+library(stringr)
+library(ggplot2)
+
+# Definicja podstawowych gatunków
+basic_genres <- c("Rock", "Hip Hop", "Pop", "Jazz", "Soul", 
+                  "Dance", "Techno", "Punk", "Metal", "Folk")
+
+# Podzielenie albumów na podstawowe gatunki
+filtered_data <- xpp %>%
+  rowwise() %>%
+  mutate(
+    Basic_genres_split = list(
+      basic_genres[basic_genres %>% sapply(function(genre) str_detect(Basic_Genres, fixed(genre, ignore_case = TRUE)))]
+    )
+  ) %>%
+  unnest(Basic_genres_split) %>% # Rozdzielenie przypisanych gatunków na osobne wiersze
+  rename(Genre = Basic_genres_split) %>% # Zmiana nazwy kolumny na 'Genre'
+  ungroup()
+
+# Dodanie kolumny z dekadą
+filtered_data <- filtered_data %>%
+  mutate(Decade = floor(Years / 10) * 10)
+
+# Obliczenie średnich ocen dla każdego gatunku w każdej dekadzie
+average_ratings_by_decade <- filtered_data %>%
+  group_by(Decade, Genre) %>%
+  summarize(Average_Rating = mean(`Average Rating`, na.rm = TRUE), .groups = "drop")
+
+# Wykres
+ggplot(average_ratings_by_decade, aes(x = Decade, y = Average_Rating, color = Genre, group = Genre)) +
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  labs(
+    title = "Średnia ocena albumów w dekadach dla każdego gatunku",
+    x = "Dekada",
+    y = "Średnia ocena",
+    color = "Gatunek"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+    axis.title = element_text(size = 14),
+    axis.text = element_text(size = 12),
+    legend.position = "bottom"
+  )
+
+
+```
+
 
