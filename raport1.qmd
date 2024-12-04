@@ -248,6 +248,7 @@ ggplot(rym, aes(x=Years, y=`Average Rating`)) +
   geom_smooth(method='lm', color="darkmagenta", linewidth = 0.7)+
   ggtitle("Regresja liniowa Average_Ratings~Years")
 ```
+
 ```{r,echo=FALSE}
 genre_counts <- sapply(basic_genres, function(genre) {
   sum(grepl(genre, rym$Basic_Genres, ignore.case = TRUE))
@@ -277,6 +278,7 @@ ggplot(genre_counts_df, aes(x = reorder(Genre, Count), y = Count, fill = Genre))
         plot.title = element_text(hjust = 0.5, size = 14, face = "bold")) + 
   guides(fill = "none") 
 ```
+
 ```{r, echo=FALSE}
 library("ggpattern")
 filtered_data <- rym %>%
@@ -315,8 +317,8 @@ ggplot(artist_counts, aes(x = reorder(`Artist Name`, Count), y = Count)) +
     legend.position = "none")
 
 ```
+
 ```{r}
-# Zakładamy, że `rym` to Twoja ramka danych
 filtered_data <- rym %>%
   filter(!is.na(Years) & !is.na(`Average Rating`))  # Użycie backticków dla nazw kolumn ze spacjami
 
@@ -431,3 +433,155 @@ ggplot() +
   theme_minimal()
 
 ```
+
+```{r}
+library(dplyr)
+library(ggplot2)
+
+# Lista podstawowych gatunków
+basic_genres <- c("Rock", "Hip Hop", "Pop", "Jazz", "Soul", "Dance", "Techno", "Punk", "Metal", "Folk")
+
+# Liczenie wystąpień każdego gatunku w kolumnie Basic_genres
+genre_counts <- sapply(basic_genres, function(genre) {
+  sum(grepl(genre, rym$Basic_Genres, ignore.case = TRUE))
+})
+
+# Tworzenie ramki danych z wynikami
+genre_counts_df <- data.frame(
+  Genre = names(genre_counts),
+  Count = genre_counts
+) %>%
+  arrange(desc(Count))
+
+# Filtrowanie danych pod kątem wybranych gatunków
+filtered_data <- rym %>%
+  filter(sapply(Basic_Genres, function(genres) {
+    any(grepl(paste(basic_genres, collapse = "|"), genres, ignore.case = TRUE))
+  }))
+
+# Obliczenie zakresu ocen dla każdego gatunku
+rating_range <- sapply(basic_genres, function(genre) {
+  genre_data <- filtered_data[grepl(genre, filtered_data$Basic_Genres, ignore.case = TRUE), ]
+  if (nrow(genre_data) > 0) {
+    min_rating <- min(as.numeric(genre_data$"Average Rating"), na.rm = TRUE)
+    max_rating <- max(as.numeric(genre_data$"Average Rating"), na.rm = TRUE)
+    range <- max_rating - min_rating
+    return(c(min_rating, max_rating, range))
+  } else {
+    return(c(NA, NA, NA))
+  }
+})
+
+# Tworzenie ramki danych z wynikami dla zakresu ocen
+rating_range_df <- data.frame(
+  Genre = basic_genres,
+  Min.Rating = rating_range[1, ],
+  Max.Rating = rating_range[2, ],
+  Range = rating_range[3, ]
+) %>%
+  arrange(desc(Range))
+
+# Połączenie liczby wystąpień z zakresem ocen
+final_data <- merge(rating_range_df, genre_counts_df, by = "Genre")
+
+# Wykres
+ggplot(final_data, aes(x = reorder(Genre, -Range))) +
+  geom_bar(aes(y = Range), stat = "identity", fill = "blue", color = "black", alpha = 0.7) +
+  geom_line(aes(y = Count / max(Count) * max(Range), group = 1, color = "Liczba wystąpień"), linewidth = 1.2) +
+  scale_y_continuous(
+    name = "Rozpiętość ocen (Max - Min)",
+    sec.axis = sec_axis(~ . * max(final_data$Count) / max(final_data$Range), name = "Liczba wystąpień")
+  ) +
+  labs(
+    title = "Rozpiętość ocen i liczba wystąpień dla wybranych gatunków",
+    x = "Gatunek",
+    y = "Rozpiętość ocen (Max - Min)"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  scale_color_manual(values = "red", name = "")
+
+```
+```{r}
+library(dplyr)
+library(ggplot2)
+
+# Lista podstawowych gatunków
+basic_genres <- c("Rock", "Hip Hop", "Pop", "Jazz", "Soul", "Dance", "Techno", "Punk", "Metal", "Folk")
+
+# Filtrowanie danych i przypisanie gatunków z listy basic_genres
+rym_filtered <- rym %>%
+  filter(sapply(Basic_Genres, function(genres) {
+    any(grepl(paste(basic_genres, collapse = "|"), genres, ignore.case = TRUE))
+  }))
+
+# Podsumowanie średnich ocen i liczby wystąpień dla każdego gatunku
+genre_summary <- sapply(basic_genres, function(genre) {
+  genre_data <- rym_filtered[grepl(genre, rym_filtered$Basic_Genres, ignore.case = TRUE), ]
+  if (nrow(genre_data) > 0) {
+    avg_rating <- mean(as.numeric(genre_data$`Average Rating`), na.rm = TRUE)
+    count <- nrow(genre_data)
+    return(c(avg_rating, count))
+  } else {
+    return(c(NA, 0))
+  }
+})
+
+# Konwersja wyników do ramki danych
+genre_summary_df <- data.frame(
+  Genre = basic_genres,
+  Average_Rating = genre_summary[1, ],
+  Count = genre_summary[2, ]
+) %>%
+  filter(!is.na(Average_Rating)) %>%
+  arrange(desc(Count)) %>%
+  slice_max(order_by = Count, n = 20)  # Wybór 20 najczęściej występujących gatunków
+
+# Tworzenie wykresu
+ggplot(genre_summary_df, aes(x = reorder(Genre, -Count))) +
+  geom_bar(aes(y = Average_Rating), stat = "identity", fill = "blue", color = "black", alpha = 0.8) +  # Histogram średnich ocen
+  geom_line(aes(y = Count / max(Count) * max(Average_Rating), group = 1), color = "red", size = 1.2) +  # Linia liczby wystąpień
+  scale_y_continuous(
+    name = "Średnia ocena",
+    sec.axis = sec_axis(~ . * max(genre_summary_df$Count) / max(genre_summary_df$Average_Rating), name = "Liczba wystąpień")  # Skalowanie osi wtórnej
+  ) +
+  labs(
+    title = "Średnie oceny i liczba wystąpień dla gatunków",
+    x = "Gatunek",
+    y = "Średnia ocena"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+    axis.title = element_text(size = 14),
+    axis.text.x = element_text(angle = 90, hjust = 1, size = 10),  # Obrót etykiet na osi X
+    legend.position = "top"
+  )
+```
+```{r}
+xpp <- rym
+xpp$"Number of Ratings" <- as.numeric(gsub(",", "", rym$"Number of Ratings"))
+
+# Filter out missing values correctly
+daxpp <- xpp %>%
+  filter(!is.na(`Number of Ratings`) & !is.na(`Average Rating`))
+
+# Updated ggplot call with correct references
+ggplot(daxpp, aes(x = `Number of Ratings`, y = as.numeric(`Average Rating`))) +
+  geom_point(alpha = 0.6, color = "blue") +  # Points
+  geom_smooth(method = "lm", color = "red", se = TRUE) +  # Trend line (linear regression)
+  scale_x_log10() +  # Logarithmic scale for number of reviews
+  labs(
+    title = "Średnia ocena vs Liczba recenzji",
+    x = "Liczba recenzji (skala logarytmiczna)",
+    y = "Średnia ocena"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+    axis.title = element_text(size = 14),
+    axis.text = element_text(size = 12)
+  )
+
+```
+
