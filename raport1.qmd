@@ -200,7 +200,7 @@ ggplot(rym, aes(x=`Average Rating`,y=after_stat(density))) +
   geom_density(aes(x=`Average Rating`, y =after_stat(density)), col="black", linewidth=0.6)+
   ggtitle("Histogram gęstości dla średnich ocen")
 ```
-Na bazie wykresu możemy stwierdzić, że oceny użytkowników mają rozkład prawostronnie skośny, z pojedynczą górką (modą) znajdującą się w okolicach punktu 3.7, co sugeruje, że większość albumów uzyskuje taką ocenę. Gęstość empiryczna zaczyna gwałtownie maleć w okolicach punktu 4.1, co potwierdza wniosek wyciągnięty na bazie wykresu pudełkowego - takie oceny są bardzo rzadkie, bowiem charakteryzują jedynie ścisłą czołówkę albumów. Rozkład ten swoim kształtem nieco przypomina rozkład normalny, lecz występuje tu wyraźna asymetria, świadcząca o jego skośności z prawej strony. Można zatem potwierdzić wcześniejszą obserwację, że oceny najczęściej pojawiające się w naszym zestawieniu, znajdują się w przedziale od umiarkowanych do nieco poniżej średniej. 
+Na bazie wykresu możemy stwierdzić, że oceny użytkowników mają rozkład prawostronnie skośny, z pojedynczą górką (modą) znajdującą się w okolicach punktu 3.7, co sugeruje, że większość albumów uzyskuje taką ocenę. Gęstość empiryczna zaczyna gwałtownie maleć w okolicach punktu 4.1, co potwierdza wniosek wyciągnięty na bazie wykresu pudełkowego --- takie oceny są bardzo rzadkie, bowiem charakteryzują jedynie ścisłą czołówkę albumów. Rozkład ten swoim kształtem nieco przypomina rozkład normalny, lecz występuje tu wyraźna asymetria, świadcząca o jego skośności z prawej strony. Można zatem potwierdzić wcześniejszą obserwację, że oceny najczęściej pojawiające się w naszym zestawieniu, znajdują się w przedziale od umiarkowanych do nieco poniżej średniej. 
 
 Następnie wygenerujemy analogiczny wykres dla lat wydania albumów.
 
@@ -210,7 +210,7 @@ ggplot(rym, aes(x=Years,y=after_stat(density))) +
   geom_density(aes(x=Years, y =after_stat(density)), col="black", linewidth=0.6)+
   ggtitle("Histogram gęstości dla lat wydania albumów")
 ```
-Rozkład lat wydania albumów ma nieco bardziej skomplikowaną naturę. Można go zaklasyfikować jako dwumodalny, czyli posiadający dwa wyraźne punkty skupienia. Pierwszy wierzchołek tego rozkładu znajduje się w okolicy lat 70., gdy światem muzyki zawładnęły gatunki, takie jak rock, metal i disco. Kolejny szczyt widoczny jest na przełomie lat 90. i 2000., kiedy na światowych scenach dominowały: pop, grunge oraz przede wszystkim - hip hop. Poza tymi okresami występowały znaczące spadki w liczbie dobrze ocenianych albumów. Szokującym może być fakt, że w obecnych czasach obserwowany jest największy spadek jakościowej muzyki od lat 50 z tym, że wtedy wydawano znacznie mniej albumów w porównaniu do dzisiejszych czasów. Warto więc zastanowić się nad pytaniem, czy w czasach współczesnych, pomimo szerokiej dostępności muzyki oraz ogromnych pieniędzy wydawanych na jej produkcję i dystrybucję, stoimy w obliczu największego kryzysu muzycznego?
+Rozkład lat wydania albumów ma nieco bardziej skomplikowaną naturę. Można go zaklasyfikować jako dwumodalny, czyli posiadający dwa wyraźne punkty skupienia. Pierwszy wierzchołek tego rozkładu znajduje się w okolicy lat 70., gdy światem muzyki zawładnęły gatunki, takie jak rock, metal i disco. Kolejny szczyt widoczny jest na przełomie lat 90. i 2000., kiedy na światowych scenach dominowały: pop, grunge oraz przede wszystkim --- hip hop. Poza tymi okresami występowały znaczące spadki w liczbie dobrze ocenianych albumów. Szokującym może być fakt, że w obecnych czasach obserwowany jest największy spadek jakościowej muzyki od lat 50 z tym, że wtedy wydawano znacznie mniej albumów w porównaniu do dzisiejszych czasów. Warto więc zastanowić się nad pytaniem, czy w czasach współczesnych, pomimo szerokiej dostępności muzyki oraz ogromnych pieniędzy wydawanych na jej produkcję i dystrybucję, stoimy w obliczu największego kryzysu muzycznego?
 
 ```{r,include=FALSE}
 ggplot(rym, aes(x=`Number of Ratings`,y=after_stat(density))) +
@@ -250,16 +250,46 @@ rownames(Summary)<-c("Min","First Quartile","Median","Third Quartile","Maximum")
 Summary
 ```
 
+Wiemy już jak rozkładały się średnie oceny użytkowników oraz lata wydania albumów. Warto w tym miejscu zastanowić się, czy istnieje między tymi zmiennymi jakaś zależność. Poszukamy zatem zależności liniowej stosując z wbudowanej w pakiet R funkcji \texttt{$lm$}, wykorzystującej model regresji liniowej. Gdyby udało się nam znaleźć między nimi silną zależnosć, moglibyśmy stwierdzić, jak zmieniała się muzyka w minionych dekadach oraz postarać się wskazać kierunek jej rozwoju w przyszłości. 
 
+Na wykres punktowy "Average Rating" vs "Years" nałożyliśmy prostą dostarczoną przez metodę \texttt{$lm$}. Prezentuje się on w następujący sposób
+
+```{r, echo=FALSE}
+ggplot(rym, aes(x=Years, y=`Average Rating`)) +
+  geom_jitter(color="plum", size=0.8, alpha=0.8) + 
+  geom_smooth(formula = y ~ x, method='lm', color="darkmagenta", linewidth = 0.7)+
+  ggtitle("Regresja liniowa Average_Ratings~Years")
+```
+Widzimy, że punkty są dość mocno rozrzucone i nie widać między nimi szukanej liniowej zależności. Model dopasował do danych prostą regresji, lecz nie możemy spodziewać się w tym przypadku dużej skuteczności. Celem poprawnej interpretacji wykresu wydobyliśmy niezbędne informacje o regresji liniowej za pomocą funkcji \texttt{$summary$}. Prezentują się one następująco
 ```{r,ECHO=FALSE}
 lm_ratings_and_years = lm(ratings~years)
 summary(lm_ratings_and_years)
 ```
+Na sam początek funkcja przekazuje nam informacje o residuach modelu, czyli różnicach między wartościami obserwowanymi a przewidywanymi przez model. Idealnie chcielibyśmy, żeby rozkład residuów był możliwie najbardziej symetryczny, a często testuje się także jego normalność. Większość punktów byłaby wtedy zbliżona do prostej, a obserwacje bardziej od niej odbiegające są względem niej symetryczne. Tym samym, chcielibyśmy, żeby mediana była zbliżona do zera. Kwartyle oraz wartości maksymalne i minimalne również powinny być symetryczne względem zera oraz możliwie jak najbardziej do siebie zbliżone. Zwizualizujemy rozkład residuów na wykresie pudełkowym.
+```{r,echo=FALSE}
+boxplot(lm_ratings_and_years[['residuals']],main='Boxplot: Residuals',ylab='residual value')
+```
+Widzimy, że mediana jest bliska zeru, co sugeruje że reszty są stosunkowo symetryczne. Wąs górny i dolny są dość symetryczne względem zera, a połowa centralnych reszt --- znajdująca się wewnątrz pudełka, między pierwszym i trzecim kwartylem --- charakteryzuje się wzlędnie małą rozpiętością. Możemy jednak zaobserwować bardzo dużo wartości odstających, które wskazują na duże trudności w dopasowaniu modelu. 
+
+Następną informacją otrzymaną z metody \texttt{$summary$} są wartości parametrów prostej regresji. Zależność liniową między zmienną objaśnianą $y$, a objaśniającą $x$ możemy zapisać jako
+$$
+y = ax + b
+$$
+Gdzie $a$ jest wspołczynnikiem kierunkowym prostej, a $b$ --- wyrazem wolnym. W naszym wypadku parametry te wynoszą $a = -1.057 \cdot 10^{-3}$ i $b = 5.871$. 
+
+Następnie w podsumowaniu umieszczone są błędy standardowe estymatorów $a$ i $b$. W naszym wypadku wynoszą one odpowiednio $0.1724$ oraz $8.676 \cdot 10^{-5}$. 
+
+Następnie dostajemy informacje o wykonanych dla parametrów testów t-studenta, przy hipotezie zerowej o średniej równej zero. Podane zostały wartości statystyk t oraz p-wartości przeprowadzonych testów. Te drugie są rzędu $10^{-16}$ zarówno dla $a$ jak i $b$, a zatem możemy oba parametry uznać za istotne.
+
+Na końcu podsumowania możemy odczytać wartości błędu standardowego residuów, współczynnika determinacji w wersji standardowej $R^2$ i skorygowanej $R^2_a$ oraz wartości statystyki testowej i p-wartośc testu F, badającego istotność co najmniej jednego z parametrów (tę informację już znamy). Warto zwrócić szczególną uwagę na te ostatnie informacje. Współczynnik $R^2$ mówi nam, jaki procent zmienności w danych jest wyjaśniany przez model. W naszym przypadku wynosi on zaledwie $2.88%$. Jest to wartość bardzo niska, co oznacza że "Years" ma słabo objaśnia "Average Rating". Skorygowana wartość wspołczynnika determinacji $R^2_a$ jest bardzo zbliżona do $R^2$, co sugeruje, że dodanie większej liczby zmiennych do modelu, nie zmieniłoby jego mocy objaśniającej. 
+
+Na bazie przeprowadzonej analizy modelu regresji liniowej możemy wykluczyć obecnośc liniowej zależności między "Average Rating" a "Years". Nie możemy wykluczyć innego rodzaju zależności między nimi, choć wykres punktowy tego nie sugeruje. Należy skorzystać również z faktu, że znamy charakter naszych danych, a nic nie wskazuje na to, żeby musiała istnieć nawet przybliżona matematyczna zależność między latami wydania albumów a ocenami przydzielonymi im przez użytkowników. 
+
+Bardziej ogólnym sposobem może okazać się sprawdzenie korelacji między "Years" a "Average Rating". Wykonajmy test korelacji Pearsona.
 ```{r, echo=FALSE}
-ggplot(rym, aes(x=Years, y=`Average Rating`)) +
-  geom_jitter(color="plum", size=0.8, alpha=0.8) + 
-  geom_smooth(method='lm', color="darkmagenta", linewidth = 0.7)+
-  ggtitle("Regresja liniowa Average_Ratings~Years")
+res <- cor.test(rym$Years, rym$"Average Rating", 
+                    method = "pearson")
+res
 ```
 
 ```{r,echo=FALSE}
