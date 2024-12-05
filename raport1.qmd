@@ -219,19 +219,24 @@ ggplot(rym, aes(x=`Number of Ratings`,y=after_stat(density))) +
   ggtitle("Histogram gęstości dla liczby ocen")
 ```
 
+Kolejnym krokiem w analizie rozkładów rozważanych zmiennych będzie wygenerowanie wykresów ich dystrybuant empirycznych za pomocą funkcji \texttt{$stat\_ecdf$}. 
 
+Dla średnich ocen wykres ten prezentuje się nastepująco.
 
 ```{r echo=FALSE}
 ggplot(rym, aes(x=`Average Rating`)) +
   stat_ecdf(geom="step") +
   ggtitle("Dystrybuanta empiryczna dla lat wydania albumów")
 ```
+Dystrybuanta empiryczna ocen użytkowników potwierdza wnioski wyciągnięte na bazie gęstości empirycznej. Największy wzrost wartości dystrybunaty możemy zaobserwować na przedziale od 3.6 do 3.9, a zatem, gdy oceny oscylują wokół wartości średniej. Dla punktu 3.9 wartość dystrybunaty wynosi około 0.9, a więc prawdopodobieństwo, że losowo wybrana ocena z próbki przekroczy próg 3.9 sięga zaledwie jednej dziesiątej. Ta obserwacja dobrze pokazuje, że albumy należące do ścisłej czołówki najlepiej ocenianych, stanowią bardzo niewielką część całego zestawienia.
+
+To samo wykonamy dla lat wydania albumów.
 ```{r,echo=FALSE}
 ggplot(rym, aes(x=Years)) +
   stat_ecdf(geom="step") +
   ggtitle("Dystrybuanta empiryczna dla lat wydania albumów")
 ```
-
+Dystrybuanta empiryczna lat wydania albumów jest znacznie bardziej wypłaszczona niż ocen użytkowników, choć nagłe tendencje wzrostowe w okolicach lat 70. i przełomu stuleci, nadal są tu dobrze widoczne, tak jak w przypadku wykresu gęstości empirycznej. Wzrost dystrybuanty zwalnia w dolinach między dwoma szczytami. Zauważmy, że dystrybuanta empiryczna przyjmuje wartość 0.5 mniej więcej w środku przedziału lat, co stwarza wrażenie równomierności rozkładu, dobrze widocznej wcześniej na wykresie pudełkowym.
 
 ```{r, include=FALSE}
 boxplot_df = data.frame(ratings, years, num_of_ratings, num_of_reviews)
@@ -239,7 +244,7 @@ Summary<-boxplot(boxplot_df)$stats
 ```
 
 
-```{r,echo=FALSE}
+```{r,include=FALSE}
 colnames(Summary)<-c("Ratings","Years","Number of Ratings", "Number of Reviews")
 rownames(Summary)<-c("Min","First Quartile","Median","Third Quartile","Maximum")
 Summary
