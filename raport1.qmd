@@ -95,7 +95,7 @@ rym$`Average Rating` <- as.numeric(rym$`Average Rating`)
 library(dplyr)
 library(stringr)
 
-basic_genres <- c("Rock", "Hip Hop", "Pop", "Jazz", "Soul", "Dance", "Techno", "Punk", "Metal", "Folk")
+basic_genres <- c("Rock", "Hip Hop", "Pop", "Jazz", "Soul", "Bop", "Blues", "Punk", "Metal", "Folk")
 
 rym <- rym %>%
   rowwise() %>%
@@ -399,7 +399,7 @@ ggplot(filtered_data, aes(x = Years, y = as.numeric(`Average Rating`))) +
   scale_y_continuous(expand = c(0, 0))
 ```
 
-Heatmapa przedstawia zależność między rokiem wydania a średnią ocen. Z łatwością jesteśmy w stanie zauważyć zagęszczenie ilości albumów w okolicach lat siedemdziesiątych i przełomu XX wieku. Również w tych latach mamy największe zagęszczenie albómów o średniej ocenie oscylującej w okolicach 3,8. Jesteśmy w stanie zauważyć znacznie odbiegającą ilość albumów o wysokiej ocenie w latach 70-90, to tutaj powstały jedne z najlepiej ocenianych tytułów w historii, lata te możemy uznać za złotą erę muzki. We współczesnych latach spotykamy się ze znacznym spadkiem jakości albumów, może to wskazywać na kryzys jakości, do którego doszło w przemyśle muzycznym. Głównym czynnikiem takiego stanu rzeczy są gigantyczne pieniądze, które napłynęły do tej branży. W dzisiejszych czasach muzykę robi się pod "tik-toka" aby poszła w viral i przyniosła dla autora jak największe zyski. Jakość wypuszczanych utworów przeszła na drugi plan. Wykres potwierdza nam, że najwięcej cenionych dzieł muzycznych pochodzi ze złotego okresu, który miał kluczowy wpływ na rozwój kultury muzycznej. 
+Heatmapa przedstawia zależność między rokiem wydania a średnią ocen. Z łatwością jesteśmy w stanie zauważyć zagęszczenie ilości albumów w okolicach lat siedemdziesiątych i przełomu XX wieku. Również w tych latach mamy największe zagęszczenie albumów o średniej ocenie oscylującej w okolicach 3.8. Jesteśmy w stanie zauważyć znacznie odbiegającą ilość albumów o wysokiej ocenie w latach 70-90, to tutaj powstały jedne z najlepiej ocenianych tytułów w historii --- lata te możemy uznać za złotą erę muzki. We współczesnych latach spotykamy się ze znacznym spadkiem jakości albumów. Może to wskazywać na kryzys, do którego doszło w przemyśle muzycznym. Głównym czynnikiem takiego stanu rzeczy są gigantyczne pieniądze, które napłynęły do tej branży. W dzisiejszych czasach muzykę robi się pod "tik-toka" aby poszła w viral i przyniosła dla autora jak największe zyski. Jakość wypuszczanych utworów przeszła na drugi plan. Wykres potwierdza nam, że najwięcej cenionych dzieł muzycznych pochodzi ze złotego okresu, który miał kluczowy wpływ na rozwój kultury muzycznej. 
 
 
 ```{r, echo=FALSE}
@@ -411,7 +411,7 @@ library(ggplot2)
 
 # Definicja podstawowych gatunków
 basic_genres <- c("Rock", "Hip Hop", "Pop", "Jazz", "Soul", 
-                  "Dance", "Techno", "Punk", "Metal", "Folk")
+                  "Bop", "Blues", "Punk", "Metal", "Folk")
 
 # Podzielenie albumów na podstawowe gatunki
 filtered_data <- rym %>%
@@ -454,7 +454,7 @@ ggplot(average_ratings_by_decade, aes(x = Decade, y = Average_Rating, color = Ge
 
 
 ```
-Na wykresie punktowym widzimy jak radziły sobie gatunki w poszczególnych dekadach. Na tej wizualizacji również jesteśmy w stanie zauważyć złote lata muzyki o najlepszym odbiorze przypadające na okres lat 60-70 oraz na lata 90 ubiegło stulecia. Widzimy duże załamanie jakości muzyki w latach 80, które przypadły na recesję i załamanie gospodarcze w USA. Lata 90 były ostatnim dobrym okresem w muzyce. Na przełomie XXI wieku możemy zobaczyć początek spadku jakości muzyki. 
+Na wykresie punktowym widzimy jak radziły sobie gatunki w poszczególnych dekadach. Na tej wizualizacji również jesteśmy w stanie zauważyć złote lata muzyki o najlepszym odbiorze przypadające na okres lat 60-70 oraz na lata 90 ubiegło stulecia. Widzimy duże załamanie jakości muzyki w latach 80, które przypadły na recesję i załamanie gospodarcze w USA. Lata 90 były ostatnim dobrym okresem w muzyce. W XXI wieku możemy zobaczyć spadek jakości muzyki zakwalifikowanej do gatunków: blues, metal, rock i jazz. 
 
 ```{r, echo=FALSE}
 rym <- rym %>%
@@ -495,7 +495,7 @@ ggplot(best_album_per_year, aes(x = Years, y = Basic_Genres, color = Basic_Genre
   )
 ```
 
-Wykres punktowy pokazuje najlepiej oceniane albumy z danego roku w podziale na gatunki. Na wykresie widzimy, że jazz w pełni zdominował lata 50 i 60 ubiegłego wieku z poprzedniego wykresu wiemy już, że w tym okresie walczył o dominację tylko z rockiem i muzyką folk. W kolejnych dekadach to rock wszedł na piedestał i utrzymał się na nim do początku lat 90. W tym okresie widzimy walkę o dominację w zasadzie dwóch gatunków: rocka i metalu, które to konkurowały ze sobą, aż do przełomu XX wieku. W pierwszej dekadzie lat dwutysięcznych królował metal. Ostatni badany okres był rywalizacją między popem a wschodzącym hip-hopem. Przejście od dominacji rocka do bardziej nowoczesnych gatunków odzwierciedla ewolucję gustów muzycznych i zmieniające się trendy w przemyśle muzycznym. 
+Wykres punktowy pokazuje najlepiej oceniane albumy z danego roku w podziale na gatunki. Na wykresie widzimy, że jazz w pełni zdominował lata 50. i 60. ubiegłego wieku. Z poprzedniego wykresu wiemy już, że w tym okresie walczył o dominację tylko z rockiem i muzyką folk. W kolejnych dekadach to rock wyszedł na prowadzenie i utrzymał się na nim do początku lat 90. W tym okresie widzimy walkę o dominację dwóch gatunków: rocka i metalu, które to konkurowały ze sobą jeszcze w drugim millenium. Ostatni badany okres był rywalizacją między popem a wschodzącym hip-hopem. Przejście od dominacji rocka do bardziej nowoczesnych gatunków odzwierciedla ewolucję gustów muzycznych i zmieniające się trendy w przemyśle muzycznym. 
 
 
 
@@ -504,7 +504,7 @@ library(dplyr)
 library(ggplot2)
 
 # Lista podstawowych gatunków
-basic_genres <- c("Rock", "Hip Hop", "Pop", "Jazz", "Soul", "Dance", "Techno", "Punk", "Metal", "Folk")
+basic_genres <- c("Rock", "Hip Hop", "Pop", "Jazz", "Soul", "Bop", "Blues", "Punk", "Metal", "Folk")
 
 # Liczenie wystąpień każdego gatunku w kolumnie Basic_genres
 genre_counts <- sapply(basic_genres, function(genre) {
@@ -568,14 +568,14 @@ ggplot(final_data, aes(x = reorder(Genre, -Range))) +
 
 ```
 
-Wykres przedstawia zależność między średnimi ocenami albumów, a ich liczbą w podziale na różne gatunki muzyczne. Z analizy wynika, że rozpiętość ocen nie jest skorelowana z liczbą wystąpień danego gatunku. Jeżeli przyjrzeliśmy się uważnie wcześniejszemu wykresowi będziemy jednak w stanie wyciągnąć inną zależność. Gatunki o największej zmienności ocen charakteryzują się również najdłuższym "stażem" w naszym rankingu. Duża rozpiętość spowodowana jest zmianą dominacji gatunków na przestrzeni lat, która wynika ze zmieniających się gustów muzycznych. Długi staż rocka zawiera zarówno momenty, w których był on hegemonem, jak i te, w których zainteresowanie tym gatunkiem było praktycznie znikome. Spowodowało to dużą zmienność w ocenie, za to jego długa dominacja sprawiła, że pod względem ilości nie ma sobie równych. Metal również potwierdza nam tę tezę. Jego panowanie dało mu dużą ilość wystąpień, jednak moda na niego szybko przeminęła. Coraz mniejsza ilość albumów tego gatunku dostawała się do naszego zestawienia, nie pozwalając na obniżenie rankingu, który zdobył podczas złotych lat panowania. Drugą największą zmiennością może pochwalić się hip-hop. Wiemy, że jego dominacja przypada w okresie ubiegłej dekady, jednak już od lat 80 był on z nami i osiągał wyjątkowo wysokie oceny, o dziwo były to też lata, w których pod względem średniej ocen nie miał sobie równych. Jak większość gatunków w latach dwutysięcznych jego oceny mocno się pogorszyły, jednak nałożyło się to na czas, w którym tak naprawdę dopiero budował swoją pozycję a ilość albumów w zestawieniu ciągle rosła pomimo spadku ocen. Dzięki temu uplasował się na drugiej pozycji pod względem zmienności. Reszta gatunków również uzyskała całkiem wysoką zmienność. Zawdzięczają ją krótkim okresem popularności, późniejszym szybkim spadkiem zainteresowania oraz długiej historii w rankingu.
+Wykres przedstawia zależność między średnimi ocenami albumów a ich liczbą, w podziale na różne gatunki muzyczne. Wynika z niego, że rozpiętość ocen nie jest skorelowana z liczbą wystąpień danego gatunku. Jeśli przyjrzymy się uważnie wcześniejszemu wykresowi, będziemy w stanie wyciągnąć inną zależność --- gatunki o największej zmienności ocen charakteryzują się również najdłuższym "stażem" w naszym rankingu. Duża rozpiętość spowodowana jest zmianą dominacji gatunków na przestrzeni lat, która wynika ze zmieniających się gustów muzycznych. Długi staż rocka zawiera zarówno momenty, w których był on hegemonem, jak i te, w których zainteresowanie tym gatunkiem było praktycznie znikome. Spowodowało to dużą zmienność w ocenie, za to jego długa dominacja sprawiła, że pod względem ilości nie ma sobie równych. Metal również potwierdza nam tę tezę. Jego panowanie dało mu dużą ilość wystąpień, jednak jego popularność szybko przeminęła. Coraz mniejsza ilość albumów tego gatunku dostawała się do naszego zestawienia, nie pozwalając na obniżenie rankingu, który zdobył podczas złotych lat panowania. Drugą największą zmiennością może pochwalić się hip-hop. Wiemy, że jego dominacja przypada na okres ubiegłej dekady, jednak już od lat 80. był on z nami i osiągał wyjątkowo wysokie oceny. Co ciekawe, były to też lata, w których --- pod względem średniej ocen --- nie miał sobie równych. Jak większość gatunków w latach dwutysięcznych, jego oceny mocno się pogorszyły, jednak pokrywa się to z okresem, w którym dopiero budował swoją pozycję, a ilość albumów w zestawieniu ciągle rosła. Dzięki temu uplasował się na drugiej pozycji pod względem zmienności. Reszta gatunków również uzyskała całkiem wysoką zmienność. Jest ona wypadkową krótkiego okresem popularności i późniejszego szybkiego spadku zainteresowania, lub przeciwnie, długiej historii w rankingu.
 
 ```{r,echo=FALSE}
 library(dplyr)
 library(ggplot2)
 
 # Lista podstawowych gatunków
-basic_genres <- c("Rock", "Hip Hop", "Pop", "Jazz", "Soul", "Dance", "Techno", "Punk", "Metal", "Folk")
+basic_genres <- c("Rock", "Hip Hop", "Pop", "Jazz", "Soul", "Bop", "Blues", "Punk", "Metal", "Folk")
 
 # Filtrowanie danych i przypisanie gatunków z listy basic_genres
 rym_filtered <- rym %>%
@@ -656,7 +656,13 @@ ggplot(daxpp, aes(x = `Number of Ratings`, y = as.numeric(`Average Rating`))) +
 
 ```
 
-Wykres wizualizuję nam średnią ocen, a liczbę recenzji z regresją liniową wyników. Analizując wykres widzimy duże zagęszczenie ilości recenzji od 300 do 3000. Wyniki w tym obszarze są do siebie zbliżone i oscylują w okolicach 3,7. Wraz ze wzrostem ilości recenzji widzimy dużą polaryzację w średniej ocenie. To zjawisko spowodowane jest odczuciami słuchaczy do danego albumu. Recenzenci potrafili chętniej oceniać tylko te albumy, które wywołały w nich skraje uczucia, zarówno te pozytywne, jak i negatywne. Albumy w przedziale od 10000 do 30000 recenzji miały większą ilość ocen pozytywnych niż negatywnych. Jednak to najczęściej oceniane albumy zdobyły bezkompromisowo najwyższe oceny. Płyty z najlepszym odbiorem przyciągały ludzi, którzy specjalnie głosowali tylko dla nich. Widzimy więc, że średnia ocen jest mocno skorelowana z liczbą recenzji, dając częściej ocenianym albumom zdecydowanie wyższe noty.
+Wykres wizualizuję nam zależność między średnią ocen a liczbą recenzji z nałożoną prostą regresji. Analizując wykres, widzimy duże zagęszczenie punktów w przedziale od 300 do 3000 wystawionych recenzji. Wyniki w tym obszarze są do siebie zbliżone i oscylują w okolicach 3,7. Wraz ze wzrostem ilości recenzji widzimy dużą polaryzację w średniej ocenie. To zjawisko spowodowane jest odczuciami słuchaczy do danego albumu. Recenzenci potrafili chętniej oceniać tylko te albumy, które wywołały w nich skraje uczucia, zarówno te pozytywne, jak i negatywne. Albumy w przedziale od 10000 do 30000 recenzji miały większą liczbę ocen pozytywnych niż negatywnych. Jednak to najczęściej oceniane albumy zdobyły bezkompromisowo najwyższe oceny. Płyty z najlepszym odbiorem przyciągały ludzi, którzy specjalnie głosowali tylko dla nich. Widzimy więc, że średnia ocen jest mocno skorelowana z liczbą recenzji, dając częściej ocenianym albumom zdecydowanie wyższe noty.
+
+\section{Podsumowanie}
+Analiza danych pozyskanych z serwisu RateYourMusic.com umożliwiła nam poznanie statystyk dotyczących muzycznych albumów, i dostarczyła odpowiedzi na zadane przez nas pytania. Wygenerowanie wykresów pudełkowych i dokładne opisanie ich parametrów zapewniły konkretną bazę pod analizę rozkładów zmiennych "Years" i "Average Rating", którą następnie rozszerzyliśmy o histogramy pradopodobieństwa z nałożonymi jądrowymi estymatorami gęstości i wizualizację empirycznych dystrybuant. Następnie pochyliliśmy się nad problemem zależności między latami wydania albumów, a ich średnimi ocenami. Metoda regresji liniowej okazała się w tym przypadku mało efektywna, dzięki czemu byliśmy w stanie stwierdzić, że relacji tej nie powinniśmy rozpatrywać w kategoriach liniowości. Przeprowadzony dalej test korelacji Pearsona wykazał, że między rozważanymi zmiennymi występuje słaba ujemna korelacja. Jako możliwe przyczyny zjawiska, zaproponowaliśmy teorię o kryzysie współczesnego rynku muzycznego oraz bardziej optymistyczną wersję --- niwystarczającej próby czasu. W dalszej części przeszliśmy do analizy albumów, z uwzględnieniem zmiennej kategorycznej, w postaci gatunków muzycznych. Z bogatego i zróżnicowanego zbioru wyodrębniliśmy dziesięć najbardziej popularnych gatunków. Histogram ich liczności wykazał, że najwięcej albumów spośród najlepszych pięciu tysięcy, należy do gatunku rock, a ich liczba przewyższa ponad dwukrotnie metal, zajmujący drugą pozycję. (analiza gatunkow c.d)
+
+Na poczatku rozważań zastanawialiśmy się także, którzy artyści mogą poszczycić sie najlepiej ocenianą dyskografią. W tym celu stworzyliśmy zestawienie dziesięciu najczęściej występujących artystów w naszym zestawieniu. Okazało się, że ten zaszczytny tytuł przypadł amerykańskiemu jazzmanowi --- Miles'owi Davis'owi, który w swojej karierze wydał 60 studyjnych albumów, spośród których aż 16 znalazło się w naszym rankingu. 
+
 
 
 
