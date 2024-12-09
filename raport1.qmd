@@ -282,6 +282,34 @@ Summary
 
 Wiemy już jak rozkładały się średnie oceny użytkowników oraz lata wydania albumów. Warto w tym miejscu zastanowić się, czy istnieje między tymi zmiennymi jakaś zależność. Poszukamy zatem zależności liniowej stosując z wbudowanej w pakiet R funkcji \texttt{$lm$}, wykorzystującej model regresji liniowej. Gdyby udało się nam znaleźć między nimi silną zależnosć, moglibyśmy stwierdzić, jak zmieniała się muzyka w minionych dekadach oraz postarać się wskazać kierunek jej rozwoju w przyszłości. 
 
+
+```{r,echo=FALSE, dev="cairo_pdf", fig.align='center', fig.width=10, fig.height=6}
+filtered_data <- rym %>%
+  filter(!is.na(Years) & !is.na(`Average Rating`))  # Użycie backticków dla nazw kolumn ze spacjami
+
+ggplot(filtered_data, aes(x = Years, y = as.numeric(`Average Rating`))) +
+  geom_bin2d(bins = 40) +  # Więcej binów dla większej szczegółowości
+  scale_fill_gradient(low = "#56B1F7", high = "#132B43", name = "Liczba albumów") +
+  labs(
+    title = "Dystrybucja albumów: Rok wydania vs Średnia ocena",
+    x = "Rok wydania",
+    y = "Średnia ocena",
+    fill = "Liczba albumów"
+  ) +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    panel.grid.major = element_blank(),  
+    panel.grid.minor = element_blank()
+  ) +
+  scale_x_continuous(
+    breaks = seq(min(filtered_data$Years, na.rm = TRUE), max(filtered_data$Years, na.rm = TRUE), by = 10),
+    expand = c(0, 0)
+  ) +
+  scale_y_continuous(expand = c(0, 0))
+```
+
+Heatmapa przedstawia zależność między rokiem wydania a średnią ocen. Z łatwością jesteśmy w stanie zauważyć zagęszczenie ilości albumów w okolicach lat siedemdziesiątych i przełomu XX wieku. Również w tych latach mamy największe zagęszczenie albumów o średniej ocenie oscylującej w okolicach 3.8. Jesteśmy w stanie zauważyć znacznie odbiegającą ilość albumów o wysokiej ocenie w latach 70-90, to tutaj powstały jedne z najlepiej ocenianych tytułów w historii --- lata te możemy uznać za złotą erę muzki. We współczesnych latach spotykamy się ze znacznym spadkiem jakości albumów. Może to wskazywać na kryzys, do którego doszło w przemyśle muzycznym. Głównym czynnikiem takiego stanu rzeczy są gigantyczne pieniądze, które napłynęły do tej branży. W dzisiejszych czasach muzykę robi się pod "tik-toka" aby poszła w viral i przyniosła dla autora jak największe zyski. Jakość wypuszczanych utworów przeszła na drugi plan. Wykres potwierdza nam, że najwięcej cenionych dzieł muzycznych pochodzi ze złotego okresu, który miał kluczowy wpływ na rozwój kultury muzycznej. 
+
 \subsection{Regresja liniowa średnich ocen i lat wydania albumów}
 Na wykres punktowy "Average Rating" vs "Years" nałożyliśmy prostą dostarczoną przez metodę \texttt{$lm$}. Prezentuje się on w następujący sposób
 
@@ -363,75 +391,6 @@ ggplot(genre_counts_df, aes(x = reorder(Genre, Count), y = Count, fill = Genre))
   geom_text(aes(label = Count), vjust = -0.5) 
 ```
 Jak widzimy na wykresie, najliczniejszą grupę spośród wszystkich gatunków ujętych w zestawieniu, stanowią albumy rockowe. Ich liczebność przewyższa ponad dwukrotnie drugi najliczniejszy gatunek - metal. Najrzadziej w rankingu występują "krążki" zaliczane do techno i dance, czyli elektronicznej muzyki tancznej.
-
-\subsection{Najlepiej ocenani wykonawcy}
-Kolejny ciekawy wniosek wysuwa się, jeśli policzymy unikalne wartości dla zbioru zawierającego artystów albumów zawartych w rankingu. Okazuje się, że jest ich jedynie 2090. A zatem istnieją wykonawcy, których dyskografie szczególnie przypadły do gustu użytkownikom serwisu. Musieli bowiem stworzyć co najmniej dwa albumy, które znalazły się w tym zestawieniu. Żeby sprawdzić, którzy artyści należą do grona "ulubionych", policzyliśmy liczbę wystąpień każdego z nich, przyporządkowaliśmy te wartości do konkretnych twórców i posortowaliśmy nasz zbiór po liczbie wystąpień w kolejności malejącej. Poniżej znajduje się zestawienie dziesięciu najlepiej ocenianych artystów.
-```{r, echo=FALSE, dev="cairo_pdf", fig.width=8, fig.height=5, fig.align='center'}
-filtered_data <- rym %>%
-  filter(`Artist Name` != "Various Artists")
-
-artist_counts <- filtered_data %>%
-  group_by(`Artist Name`) %>%
-  summarise(Count = n()) %>%
-  arrange(desc(Count)) %>%
-  head(10)
-
-ggplot(artist_counts, aes(x = reorder(`Artist Name`, Count), y = Count)) +
-  geom_bar_pattern(
-    stat = "identity",
-    aes(pattern = "stripe"),
-    fill = "steelblue",
-    color = "black",
-    pattern_fill = "lightgray",
-    pattern_angle = 45,
-    pattern_density = 0.2,
-    pattern_spacing = 0.03,   
-  ) +
-  geom_text(aes(label = Count), color = "black", hjust = -0.2) +
-  coord_flip() +
-  labs(
-    title = "10 najlepiej ocenianych artystów",
-    x = "Nazwa artysty",
-    y = "Liczba albumów"
-  ) +
-  theme_solarized() +
-  theme(
-    plot.title = element_text(hjust = 0.5),
-    plot.margin = margin(1, 1, 1, 1),
-    legend.position = "none" 
-  ) 
-
-```
-
-
-Jak możemy zauważyć na wykresie, najczęściej powtarzającym się arystą w naszym rankingu jest amerykański jazzman, Miles Davis. Aż siedemnaście albumów z jego dyskografii zostało zakwalifikowanych do czołówki światowej muzyki. Na drugim miejscu uplasował się John Coltrane, z czternastoma albumami. Coltrane i Miles często ze sobą wspólpracowali. Stworzyli razem sześć albumów kooperacyjnych osadzonych w gatunku jazz. Gatunek ten jest najczęściej występującym w tym zestawieniu. Jego przedstawicielami, oprócz czołowej dwójki są jeszcze: Pharoah Sanders, Herbie Hancock oraz twórcy muzyki filmowej --- John Williams i Ennio Morricone. W najlepszej dziesiątce znalazło się jeszcze trzech reprezentantów muzyki rockowej --- Bob Dylan, The Beatles i The Fall, a także pojedyczny twórca bluesowy, Tom Waits.
-
-```{r,echo=FALSE, dev="cairo_pdf", fig.align='center', fig.width=10, fig.height=6}
-filtered_data <- rym %>%
-  filter(!is.na(Years) & !is.na(`Average Rating`))  # Użycie backticków dla nazw kolumn ze spacjami
-
-ggplot(filtered_data, aes(x = Years, y = as.numeric(`Average Rating`))) +
-  geom_bin2d(bins = 40) +  # Więcej binów dla większej szczegółowości
-  scale_fill_gradient(low = "#56B1F7", high = "#132B43", name = "Liczba albumów") +
-  labs(
-    title = "Dystrybucja albumów: Rok wydania vs Średnia ocena",
-    x = "Rok wydania",
-    y = "Średnia ocena",
-    fill = "Liczba albumów"
-  ) +
-  theme(
-    plot.title = element_text(hjust = 0.5),
-    panel.grid.major = element_blank(),  
-    panel.grid.minor = element_blank()
-  ) +
-  scale_x_continuous(
-    breaks = seq(min(filtered_data$Years, na.rm = TRUE), max(filtered_data$Years, na.rm = TRUE), by = 10),
-    expand = c(0, 0)
-  ) +
-  scale_y_continuous(expand = c(0, 0))
-```
-
-Heatmapa przedstawia zależność między rokiem wydania a średnią ocen. Z łatwością jesteśmy w stanie zauważyć zagęszczenie ilości albumów w okolicach lat siedemdziesiątych i przełomu XX wieku. Również w tych latach mamy największe zagęszczenie albumów o średniej ocenie oscylującej w okolicach 3.8. Jesteśmy w stanie zauważyć znacznie odbiegającą ilość albumów o wysokiej ocenie w latach 70-90, to tutaj powstały jedne z najlepiej ocenianych tytułów w historii --- lata te możemy uznać za złotą erę muzki. We współczesnych latach spotykamy się ze znacznym spadkiem jakości albumów. Może to wskazywać na kryzys, do którego doszło w przemyśle muzycznym. Głównym czynnikiem takiego stanu rzeczy są gigantyczne pieniądze, które napłynęły do tej branży. W dzisiejszych czasach muzykę robi się pod "tik-toka" aby poszła w viral i przyniosła dla autora jak największe zyski. Jakość wypuszczanych utworów przeszła na drugi plan. Wykres potwierdza nam, że najwięcej cenionych dzieł muzycznych pochodzi ze złotego okresu, który miał kluczowy wpływ na rozwój kultury muzycznej. 
 
 
 ```{r, echo=FALSE, dev="cairo_pdf", fig.align='center', fig.width=10, fig.height=6}
@@ -527,7 +486,6 @@ ggplot(best_album_per_year, aes(x = Years, y = Basic_Genres, color = Basic_Genre
 Wykres punktowy pokazuje najlepiej oceniane albumy z danego roku w podziale na gatunki. Na wykresie widzimy, że jazz w pełni zdominował lata 50. i 60. ubiegłego wieku. Z poprzedniego wykresu wiemy już, że w tym okresie walczył o dominację tylko z rockiem i muzyką folk. W kolejnych dekadach to rock wyszedł na prowadzenie i utrzymał się na nim do początku lat 90. W tym okresie widzimy walkę o dominację dwóch gatunków: rocka i metalu, które to konkurowały ze sobą jeszcze w drugim millenium. Ostatni badany okres był rywalizacją między popem a wschodzącym hip-hopem. Przejście od dominacji rocka do bardziej nowoczesnych gatunków odzwierciedla ewolucję gustów muzycznych i zmieniające się trendy w przemyśle muzycznym. 
 
 
-
 ```{r,echo=FALSE, dev="cairo_pdf", fig.align='center', fig.width=10, fig.height=6}
 library(dplyr)
 library(ggplot2)
@@ -580,7 +538,7 @@ final_data <- merge(rating_range_df, genre_counts_df, by = "Genre")
 
 # Wykres
 ggplot(final_data, aes(x = reorder(Genre, -Range))) +
-  geom_bar(aes(y = Range), stat = "identity", fill = "blue", color = "black", alpha = 0.7) +
+  geom_bar(aes(y = Range), stat = "identity", fill = "lightblue", color = "black", alpha = 0.7) +
   geom_line(aes(y = Count / max(Count) * max(Range), group = 1, color = "Liczba wystąpień"), linewidth = 1.2) +
   scale_y_continuous(
     name = "Rozpiętość ocen (Max - Min)",
@@ -593,7 +551,7 @@ ggplot(final_data, aes(x = reorder(Genre, -Range))) +
   ) +
   theme(axis.text.x = element_text(angle = 90, hjust = 0.5),
         plot.title = element_text(hjust = 0.5)) +
-  scale_color_manual(values = "red", name = "")
+  scale_color_manual(values = "maroon4", name = "")
 
 ```
 
@@ -636,8 +594,8 @@ genre_summary_df <- data.frame(
 
 # Tworzenie wykresu
 ggplot(genre_summary_df, aes(x = reorder(Genre, -Count))) +
-  geom_bar(aes(y = Average_Rating), stat = "identity", fill = "blue", color = "black", alpha = 0.8) +  # Histogram średnich ocen
-  geom_line(aes(y = Count / max(Count) * max(Average_Rating), group = 1), color = "red", linewidth = 1.2) +  # Linia liczby wystąpień
+  geom_bar(aes(y = Average_Rating), stat = "identity", fill = "lightblue", color = "black", alpha = 0.8) +  # Histogram średnich ocen
+  geom_line(aes(y = Count / max(Count) * max(Average_Rating), group = 1), color = "maroon4", linewidth = 1.2) +  # Linia liczby wystąpień
   scale_y_continuous(
     name = "Średnia ocena",
     sec.axis = sec_axis(~ . * max(genre_summary_df$Count) / max(genre_summary_df$Average_Rating), name = "Liczba wystąpień")  # Skalowanie osi wtórnej
@@ -666,8 +624,8 @@ daxpp <- xpp %>%
 
 # Updated ggplot call with correct references
 ggplot(daxpp, aes(x = `Number of Ratings`, y = as.numeric(`Average Rating`))) +
-  geom_point(alpha = 0.6, color = "blue") +  # Points
-  geom_smooth(formula = y ~ x, method = "lm", color = "red", se = TRUE) +  # Trend line (linear regression)
+  geom_point(alpha = 0.6, color = "indianred") +  # Points
+  geom_smooth(formula = y ~ x, method = "lm", color = "darkred", se = TRUE) +  # Trend line (linear regression)
   scale_x_log10() +  # Logarithmic scale for number of reviews
   labs(
     title = "Średnia ocena vs Liczba recenzji",
@@ -681,6 +639,49 @@ ggplot(daxpp, aes(x = `Number of Ratings`, y = as.numeric(`Average Rating`))) +
 ```
 
 Wykres wizualizuję nam zależność między średnią ocen a liczbą recenzji z nałożoną prostą regresji. Analizując wykres, widzimy duże zagęszczenie punktów w przedziale od 300 do 3000 wystawionych recenzji. Wyniki w tym obszarze są do siebie zbliżone i oscylują w okolicach 3,7. Wraz ze wzrostem ilości recenzji widzimy dużą polaryzację w średniej ocenie. To zjawisko spowodowane jest odczuciami słuchaczy do danego albumu. Recenzenci potrafili chętniej oceniać tylko te albumy, które wywołały w nich skraje uczucia, zarówno te pozytywne, jak i negatywne. Albumy w przedziale od 10000 do 30000 recenzji miały większą liczbę ocen pozytywnych niż negatywnych. Jednak to najczęściej oceniane albumy zdobyły bezkompromisowo najwyższe oceny. Płyty z najlepszym odbiorem przyciągały ludzi, którzy specjalnie głosowali tylko dla nich. Widzimy więc, że średnia ocen jest mocno skorelowana z liczbą recenzji, dając częściej ocenianym albumom zdecydowanie wyższe noty.
+
+\subsection{Najlepiej ocenani wykonawcy}
+Kolejny ciekawy wniosek wysuwa się, jeśli policzymy unikalne wartości dla zbioru zawierającego artystów albumów zawartych w rankingu. Okazuje się, że jest ich jedynie 2090. A zatem istnieją wykonawcy, których dyskografie szczególnie przypadły do gustu użytkownikom serwisu. Musieli bowiem stworzyć co najmniej dwa albumy, które znalazły się w tym zestawieniu. Żeby sprawdzić, którzy artyści należą do grona "ulubionych", policzyliśmy liczbę wystąpień każdego z nich, przyporządkowaliśmy te wartości do konkretnych twórców i posortowaliśmy nasz zbiór po liczbie wystąpień w kolejności malejącej. Poniżej znajduje się zestawienie dziesięciu najlepiej ocenianych artystów.
+
+```{r, echo=FALSE, dev="cairo_pdf", fig.width=8, fig.height=5, fig.align='center'}
+filtered_data <- rym %>%
+  filter(`Artist Name` != "Various Artists")
+
+artist_counts <- filtered_data %>%
+  group_by(`Artist Name`) %>%
+  summarise(Count = n()) %>%
+  arrange(desc(Count)) %>%
+  head(10)
+
+ggplot(artist_counts, aes(x = reorder(`Artist Name`, Count), y = Count)) +
+  geom_bar_pattern(
+    stat = "identity",
+    aes(pattern = "stripe"),
+    fill = "steelblue",
+    color = "black",
+    pattern_fill = "lightgray",
+    pattern_angle = 45,
+    pattern_density = 0.2,
+    pattern_spacing = 0.03,   
+  ) +
+  geom_text(aes(label = Count), color = "black", hjust = -0.2) +
+  coord_flip() +
+  labs(
+    title = "10 najlepiej ocenianych artystów",
+    x = "Nazwa artysty",
+    y = "Liczba albumów"
+  ) +
+  theme_solarized() +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    plot.margin = margin(1, 1, 1, 1),
+    legend.position = "none" 
+  ) 
+
+```
+
+
+Jak możemy zauważyć na wykresie, najczęściej powtarzającym się arystą w naszym rankingu jest amerykański jazzman, Miles Davis. Aż siedemnaście albumów z jego dyskografii zostało zakwalifikowanych do czołówki światowej muzyki. Na drugim miejscu uplasował się John Coltrane, z czternastoma albumami. Coltrane i Miles często ze sobą wspólpracowali. Stworzyli razem sześć albumów kooperacyjnych osadzonych w gatunku jazz. Gatunek ten jest najczęściej występującym w tym zestawieniu. Jego przedstawicielami, oprócz czołowej dwójki są jeszcze: Pharoah Sanders, Herbie Hancock oraz twórcy muzyki filmowej --- John Williams i Ennio Morricone. W najlepszej dziesiątce znalazło się jeszcze trzech reprezentantów muzyki rockowej --- Bob Dylan, The Beatles i The Fall, a także pojedyczny twórca bluesowy, Tom Waits.
 
 \section{Podsumowanie}
 Analiza danych pozyskanych z serwisu RateYourMusic.com umożliwiła nam poznanie statystyk dotyczących muzycznych albumów, i dostarczyła odpowiedzi na zadane przez nas pytania. Wygenerowanie wykresów pudełkowych i dokładne opisanie ich parametrów zapewniły konkretną bazę pod analizę rozkładów zmiennych "Years" i "Average Rating", którą następnie rozszerzyliśmy o histogramy pradopodobieństwa z nałożonymi jądrowymi estymatorami gęstości i wizualizację empirycznych dystrybuant. Następnie pochyliliśmy się nad problemem zależności między latami wydania albumów, a ich średnimi ocenami. Metoda regresji liniowej okazała się w tym przypadku mało efektywna, dzięki czemu byliśmy w stanie stwierdzić, że relacji tej nie powinniśmy rozpatrywać w kategoriach liniowości. Przeprowadzony dalej test korelacji Pearsona wykazał, że między rozważanymi zmiennymi występuje słaba ujemna korelacja. Jako możliwe przyczyny zjawiska, zaproponowaliśmy teorię o kryzysie współczesnego rynku muzycznego oraz bardziej optymistyczną wersję --- niwystarczającej próby czasu. W dalszej części przeszliśmy do analizy albumów, z uwzględnieniem zmiennej kategorycznej, w postaci gatunków muzycznych. Z bogatego i zróżnicowanego zbioru wyodrębniliśmy dziesięć najbardziej popularnych gatunków. Histogram ich liczności wykazał, że najwięcej albumów spośród najlepszych pięciu tysięcy, należy do gatunku rock, a ich liczba przewyższa ponad dwukrotnie metal, zajmujący drugą pozycję. (analiza gatunkow c.d)
