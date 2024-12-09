@@ -2,7 +2,21 @@
 title: "Najlepsze albumy muzyczne"
 subtitle: "wg użytkowników RateYourMusic.com"
 authors: "Bartosz Łuksza, Rafał Głodek"
-format: pdf
+format:
+  pdf:
+    include-in-header:
+      text: |
+        \usepackage{float}
+        \usepackage[polish]{babel}
+        \makeatletter
+        \def\fps@figure{H}
+        \makeatother
+        \usepackage{caption}
+        \captionsetup{justification=centering}
+    toc: true
+    toccolor: black
+    toc-title: "Spis treści"
+
 ---
 
 \section{Wprowadzenie}
@@ -81,6 +95,13 @@ library(tidyverse)
 ```
 
 ```{r, include=FALSE}
+library(ggthemes)
+theme_set(theme_minimal())
+theme_set(theme_solarized())
+```
+
+
+```{r, include=FALSE}
 rym <- read_csv("rym_top_5000_all_time.csv")
 ```
 
@@ -125,11 +146,14 @@ print(mean(num_of_reviews))
 W pierwszej części naszej analizy zbadamy, jak rozkładają się średnie ocen wystawionych przez użytkowników oraz lata wydania albumów. Zaczniemy od wygenerowania wykresów pudełkowych dla każdej z nich oraz wyliczenia jego parametrów - mediany, pierwszego i trzeciego kwartyla, rozstępu międzykwartylowego oraz górnego i dolnego wąsa. Ponadto na wykres pudełkowy nałożymy także realizację naszej zmiennej w postaci punktów oraz jej średnią arytmetyczną. 
 
 Wykres pudełkowy dla średnich ocen prezentuje się następująco
-
-
-```{r, echo=FALSE}
+```{r, include=FALSE}
 library(hrbrthemes)
 library(viridis)
+library("ggpattern")
+```
+
+
+```{r, echo=FALSE, dev="cairo_pdf", fig.align='center', fig.width=10, fig.height=6}
 ggplot(rym, aes(x=ratings_name,y=ratings)) +
     geom_boxplot() +
     scale_fill_viridis(discrete=TRUE,alpha=0) +
@@ -137,8 +161,10 @@ ggplot(rym, aes(x=ratings_name,y=ratings)) +
     geom_hline(yintercept=mean(rym$`Average Rating`), linetype="dashed", color = "darkred") +
     ggtitle("Wykres pudełkowy średnich ocen") +
     theme(plot.title = element_text(hjust = 0.5)) +
-    xlab("")
+    xlab("") 
+
 ```
+
 Korzystając z funkcji \texttt{$boxplot.stats$} wydobędziemy z wykresu najważniejsze dane. Przedstawimy je w formie tabeli
 
 \begin{center}
@@ -161,15 +187,16 @@ Na bazie wykresu oraz tabeli możemy wyciągnąć kilka istotnych wniosków. Zgo
 
 Teraz przeprowadzimy analogiczną analizę dla lat wydania albumów. Wygenerujmy dla danych wykres pudełkowy
 
-```{r,echo=FALSE}
+```{r,echo=FALSE,dev="cairo_pdf", fig.align='center',fig.width=10, fig.height=6}
 ggplot(rym, aes(x=years_name,y=years)) +
     geom_boxplot() +
     scale_fill_viridis(discrete=TRUE,alpha=0) +
     geom_jitter(color="blue", size=0.4, alpha=0.3) +
     geom_hline(yintercept=mean(rym$`Years`), linetype="dashed", color = "darkblue") +
     ggtitle("Wykres pudełkowy dla lat wydania albumów") +
-    theme(plot.title = element_text(hjust = 0.5))+
+    theme(plot.title = element_text(hjust = 0.5)) +
     xlab("")
+
 ```
 Znów wykorzystamy funkcję \texttt{$boxplot.stats$} i wyliczymy parametry tego wykresu pudełkowego. Zawiera je poniższa tabela.
 
@@ -193,22 +220,23 @@ Wyciągnijmy teraz wnioski z tabeli i wykresu. Zauważmy, że wąsy górne i dol
 
 W następnym kroku dla każdej z rozważanych zmiennych wygenerujemy histogram prawdopodobieństwa \texttt{$geom\_histogram$} i dopasujemy do niego jądrowy estymator gęstości używając \texttt{$geom\_density$}. Wynik dla średnich ocen prezentuje się następująco
 
-```{r,echo=FALSE}
-library(ggplot2)
+```{r,echo=FALSE, dev="cairo_pdf", fig.align='center'}
 ggplot(rym, aes(x=`Average Rating`,y=after_stat(density))) +
   geom_histogram(bins=40, fill="red", col="darkred", alpha=0.5) +
   geom_density(aes(x=`Average Rating`, y =after_stat(density)), col="black", linewidth=0.6)+
-  ggtitle("Histogram gęstości dla średnich ocen")
+  ggtitle("Histogram gęstości dla średnich ocen") +
+  theme(plot.title = element_text(hjust = 0.5))
 ```
 Na bazie wykresu możemy stwierdzić, że oceny użytkowników mają rozkład prawostronnie skośny, z pojedynczą górką (modą) znajdującą się w okolicach punktu 3.7, co sugeruje, że większość albumów uzyskuje taką ocenę. Gęstość empiryczna zaczyna gwałtownie maleć w okolicach punktu 4.1, co potwierdza wniosek wyciągnięty na bazie wykresu pudełkowego --- takie oceny są bardzo rzadkie, bowiem charakteryzują jedynie ścisłą czołówkę albumów. Rozkład ten swoim kształtem nieco przypomina rozkład normalny, lecz występuje tu wyraźna asymetria, świadcząca o jego skośności z prawej strony. Można zatem potwierdzić wcześniejszą obserwację, że oceny najczęściej pojawiające się w naszym zestawieniu, znajdują się w przedziale od umiarkowanych do nieco poniżej średniej. 
 
 Następnie wygenerujemy analogiczny wykres dla lat wydania albumów.
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, dev="cairo_pdf", fig.align='center'}
 ggplot(rym, aes(x=Years,y=after_stat(density))) +
   geom_histogram(bins=30, fill="blue", col="darkblue", alpha=0.5) +
   geom_density(aes(x=Years, y =after_stat(density)), col="black", linewidth=0.6)+
-  ggtitle("Histogram gęstości dla lat wydania albumów")
+  ggtitle("Histogram gęstości dla lat wydania albumów") +
+  theme(plot.title = element_text(hjust = 0.5))
 ```
 Rozkład lat wydania albumów ma nieco bardziej skomplikowaną naturę. Można go zaklasyfikować jako dwumodalny, czyli posiadający dwa wyraźne punkty skupienia. Pierwszy wierzchołek tego rozkładu znajduje się w okolicy lat 70., gdy światem muzyki zawładnęły gatunki, takie jak rock, metal i disco. Kolejny szczyt widoczny jest na przełomie lat 90. i 2000., kiedy na światowych scenach dominowały: pop, grunge oraz przede wszystkim --- hip hop. Poza tymi okresami występowały znaczące spadki w liczbie dobrze ocenianych albumów. Szokującym może być fakt, że w obecnych czasach obserwowany jest największy spadek jakościowej muzyki od lat 50 z tym, że wtedy wydawano znacznie mniej albumów w porównaniu do dzisiejszych czasów. Warto więc zastanowić się nad pytaniem, czy w czasach współczesnych, pomimo szerokiej dostępności muzyki oraz ogromnych pieniędzy wydawanych na jej produkcję i dystrybucję, stoimy w obliczu największego kryzysu muzycznego?
 
@@ -223,18 +251,20 @@ Kolejnym krokiem w analizie rozkładów rozważanych zmiennych będzie wygenerow
 
 Dla średnich ocen wykres ten prezentuje się nastepująco.
 
-```{r echo=FALSE}
+```{r echo=FALSE, dev="cairo_pdf", fig.align='center'}
 ggplot(rym, aes(x=`Average Rating`)) +
-  stat_ecdf(geom="step") +
-  ggtitle("Dystrybuanta empiryczna dla lat wydania albumów")
+  stat_ecdf(geom="step", color="red") +
+  ggtitle("Dystrybuanta empiryczna dla lat wydania albumów") +
+  theme(plot.title = element_text(hjust = 0.5))
 ```
 Dystrybuanta empiryczna ocen użytkowników potwierdza wnioski wyciągnięte na bazie gęstości empirycznej. Największy wzrost wartości dystrybunaty możemy zaobserwować na przedziale od 3.6 do 3.9, a zatem, gdy oceny oscylują wokół wartości średniej. Dla punktu 3.9 wartość dystrybunaty wynosi około 0.9, a więc prawdopodobieństwo, że losowo wybrana ocena z próbki przekroczy próg 3.9 sięga zaledwie jednej dziesiątej. Ta obserwacja dobrze pokazuje, że albumy należące do ścisłej czołówki najlepiej ocenianych, stanowią bardzo niewielką część całego zestawienia.
 
 To samo wykonamy dla lat wydania albumów.
-```{r,echo=FALSE}
+```{r,echo=FALSE, dev="cairo_pdf", fig.align='center'}
 ggplot(rym, aes(x=Years)) +
-  stat_ecdf(geom="step") +
-  ggtitle("Dystrybuanta empiryczna dla lat wydania albumów")
+  stat_ecdf(geom="step", color="blue") +
+  ggtitle("Dystrybuanta empiryczna dla lat wydania albumów") +
+  theme(plot.title = element_text(hjust = 0.5))
 ```
 Dystrybuanta empiryczna lat wydania albumów jest znacznie bardziej wypłaszczona niż ocen użytkowników, choć nagłe tendencje wzrostowe w okolicach lat 70. i przełomu stuleci, nadal są tu dobrze widoczne, tak jak w przypadku wykresu gęstości empirycznej. Wzrost dystrybuanty zwalnia w dolinach między dwoma szczytami. Zauważmy, że dystrybuanta empiryczna przyjmuje wartość 0.5 mniej więcej w środku przedziału lat, co stwarza wrażenie równomierności rozkładu, dobrze widocznej wcześniej na wykresie pudełkowym.
 
@@ -252,13 +282,15 @@ Summary
 
 Wiemy już jak rozkładały się średnie oceny użytkowników oraz lata wydania albumów. Warto w tym miejscu zastanowić się, czy istnieje między tymi zmiennymi jakaś zależność. Poszukamy zatem zależności liniowej stosując z wbudowanej w pakiet R funkcji \texttt{$lm$}, wykorzystującej model regresji liniowej. Gdyby udało się nam znaleźć między nimi silną zależnosć, moglibyśmy stwierdzić, jak zmieniała się muzyka w minionych dekadach oraz postarać się wskazać kierunek jej rozwoju w przyszłości. 
 
+\subsection{Regresja liniowa średnich ocen i lat wydania albumów}
 Na wykres punktowy "Average Rating" vs "Years" nałożyliśmy prostą dostarczoną przez metodę \texttt{$lm$}. Prezentuje się on w następujący sposób
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, dev="cairo_pdf", fig.align='center',fig.width=10, fig.height=6}
 ggplot(rym, aes(x=Years, y=`Average Rating`)) +
   geom_jitter(color="plum", size=0.8, alpha=0.8) + 
   geom_smooth(formula = y ~ x, method='lm', color="darkmagenta", linewidth = 0.7)+
-  ggtitle("Regresja liniowa Average_Ratings~Years")
+  ggtitle(expression(bold("Regresja liniowa") ~ ": Average_Ratings ~ Years")) +
+  theme(plot.title = element_text(hjust = 0.5))
 ```
 Widzimy, że punkty są dość mocno rozrzucone i nie widać między nimi szukanej liniowej zależności. Model dopasował do danych prostą regresji, lecz nie możemy spodziewać się w tym przypadku dużej skuteczności. Celem poprawnej interpretacji wykresu wydobyliśmy niezbędne informacje o regresji liniowej za pomocą funkcji \texttt{$summary$}. Prezentują się one następująco
 ```{r,echo=FALSE}
@@ -266,8 +298,8 @@ lm_ratings_and_years = lm(ratings~years)
 summary(lm_ratings_and_years)
 ```
 Na sam początek funkcja przekazuje nam informacje o residuach modelu, czyli różnicach między wartościami obserwowanymi a przewidywanymi przez model. Idealnie chcielibyśmy, żeby rozkład residuów był możliwie najbardziej symetryczny, a często testuje się także jego normalność. Większość punktów byłaby wtedy zbliżona do prostej, a obserwacje bardziej od niej odbiegające są względem niej symetryczne. Tym samym, chcielibyśmy, żeby mediana była zbliżona do zera. Kwartyle oraz wartości maksymalne i minimalne również powinny być symetryczne względem zera oraz możliwie jak najbardziej do siebie zbliżone. Zwizualizujemy rozkład residuów na wykresie pudełkowym.
-```{r,echo=FALSE}
-boxplot(lm_ratings_and_years[['residuals']],main='Boxplot: Residuals',ylab='residual value')
+```{r,echo=FALSE, fig.align='center'}
+boxplot(lm_ratings_and_years[['residuals']],main='Wykres pudełkowy residuów',ylab='Wartość residuów')
 ```
 Widzimy, że mediana jest bliska zeru, co sugeruje że reszty są stosunkowo symetryczne. Wąs górny i dolny są dość symetryczne względem zera, a połowa centralnych reszt --- znajdująca się wewnątrz pudełka, między pierwszym i trzecim kwartylem --- charakteryzuje się wzlędnie małą rozpiętością. Możemy jednak zaobserwować bardzo dużo wartości odstających, które wskazują na duże trudności w dopasowaniu modelu. 
 
@@ -285,6 +317,7 @@ Na końcu podsumowania możemy odczytać wartości błędu standardowego residu�
 
 Na bazie przeprowadzonej analizy modelu regresji liniowej możemy wykluczyć obecnośc liniowej zależności między "Average Rating" a "Years". Nie możemy wykluczyć innego rodzaju zależności między nimi, choć wykres punktowy tego nie sugeruje. Należy skorzystać również z faktu, że znamy charakter naszych danych, a nic nie wskazuje na to, żeby musiała istnieć nawet przybliżona matematyczna zależność między latami wydania albumów a ocenami przydzielonymi im przez użytkowników. 
 
+\subsection{Test korelacji między średnimi ocenami a latami wydania albumów}
 Bardziej ogólnym sposobem może okazać się sprawdzenie korelacji między "Years" a "Average Rating". Wykonajmy test korelacji Pearsona, przy hipotezie zerowej mówiącej o braku korelacji między zmiennymi ($H_0: \rho = 0$).
 ```{r, echo=FALSE}
 res <- cor.test(rym$Years, rym$"Average Rating", 
@@ -295,9 +328,12 @@ Wyniki testu na początku dostarczają nam informacje o wartości statystyki tes
 
 Z dotychczasowej analizy możemy wywnioskować, że zależność między latami wydania albumów a średnimi ocenami użytkowników z pewnością nie jest liniowa, ale zmienne są (słabo) ujemnie skorelowane. Nie można zatem jednoznacznie stwierdzić, że im album jest nowszy, tym niższą średnią ocen otrzymał, ale w ogólności, wraz z upływem czasu oceny użytkowników malały. Oczywiście nasze zestawienie zawiera 5000 najlepiej ocenianych dzieł współczesnej muzyki, więc nie należy także wysuwać wniosku, mówiącego że w obecnych czasach tworzona jest mniej jakościowa muzyka, niż w poprzednim stuleciu. Dobrą sugestią w kontekście interpretacji wyników może być zastąpienie pojęcia "jakości" muzyki pojęciem "ikoniczności". Wówczas znika problem nazywania gorzej ocenianych albumów w rozważanym rankingu jako "Słabych" --- w końcu album z najniższą oceną $3.52$ dalej jest pieciotysięcznym najlepiej ocenianym dziełem muzyki. Zamiast tego można je uznać za mniej ikoniczne, czyli takie, który odcisnęły mniejsze piętno na historii muzyki. Używajac tej intepretacji, możemy stwierdzić, że w ogólności, nowsze dzieła muzyczne są uznawane za mniej istotne kulturowo. Według nas, ten trend może mieć dwie niewykluczające się przyczyny. Najprostsze, i często przyjmowane przez słuchaczy lubujących się w dwudziestowiecznej muzyce, wyjaśnienie mówi, że muzyka (a nawet cała kultura) swoje lata świetności ma już za sobą i wytwory współczeności nigdy nie dorównają klasycznym poprzednikom. Wizja ta jest dość pesymistyczna, ale z pewnych względów nie można jej wykluczyć. Niepodważalnym faktem jest to, że muzyka faktycznie przeżyła największy przełom w poprzednim stuleciu. Liczba gatunków namnożyła się do poziomu, w którym zliczenie ich wszystkich jest praktycznie niemożliwe, a cyfrowe przetwarzanie dźwięku otworzyło niemalże nieskończone możliwości dla twórców. Był to również pierwszy moment, kiedy światowa publika uświadomiła sobie jak wielki jest wpływ muzyki na różne aspekty ich życia codziennego --- w końcu badania wykazują, że muzyka świąteczna w sklepach w okresie bożonarodzeniowym zwiększa wydatki klientów o $12%$. Drugie wyjaśnienie, które proponujemy, pozostawia słuchaczom więcej nadziei na przyszłość, ponieważ naszym zdaniem nowe wydania nie przeszły jeszcze próby czasu, a jest ona niezbędna żeby zaklasyfikować je jako ikoniczne. Krytycy muzyczni bardzo często odnoszą proces tzw. "starzenia się" do albumów muzycznych. Dzieło, które "dobrze się zestarzało" pozostaje aktualne mimo upływu lat, zarówno pod względem sonicznym, jak i zawartych w nim kontekstów kulturowych. Takie albumy zaliczane są do grona klasyków gatunkowych. W opozycji do nich stoją krążki, które "źle się zestarzały" z przyczyn niewystarczającej głębi lirycznej lub mało wyróżniającej się warstwy muzycznej. Czytelnik z pewnością sam jest w stanie przywołać przykład utworu lub albumu, który w krótkim czasie przeszedł drogę od światowego hitu do dzieła zapomnianego. W dzisiejszych czasach to zjawisko jest bardzo popularne, ponieważ rozwój internetu sprzyja dynamicznemu rozprzestrzenianiu się trendów w kulturze, które, wielokrotnie powielane, szybko stają sie nieaktualne.
 
-\subsection{Analiza gatunków muzycznych}
+\subsection{Najpopularniejsze gatunki muzyczne}
+
 Celem dokładniejszego zagłębienia się w temat i dokonania obszerniejszej analizy, wyodrębniliśmy z pobranego pliku informacje o gatunkach wymienionych w zestawieniu albumów oraz ich autorach. Ze względu na dużą różnorodność gatunków, wzięliśmy pod uwagę 10 najpopularniejszych z nich. Poniższy histogram przedstawia jak dużo spośród wszystkich 5000 albumów należących do rankingu, jest zaklasyfikowanych do każdego z gatunków.
-```{r,echo=FALSE}
+
+
+```{r,echo=FALSE, dev="cairo_pdf", fig.width=10, fig.height=6, fig.align='center'}
 genre_counts <- sapply(basic_genres, function(genre) {
   sum(grepl(genre, rym$Basic_Genres, ignore.case = TRUE))
 })
@@ -314,23 +350,23 @@ colors <- c("#ADD8E6", "#FFDAB9", "#90EE90", "#FFB6C1", "#FFE4B5",
                    "#D3D3D3", "#B0E0E6", "#E6E6FA", "#FFFACD", "#F5DEB3")
 
 ggplot(genre_counts_df, aes(x = reorder(Genre, Count), y = Count, fill = Genre)) +
-  geom_bar(stat = "identity", color = "black", width = 0.7) + 
-  scale_fill_manual(values = colors) + 
-  theme_minimal() +
+  geom_bar(stat = "identity", color = "black", width = 0.7)+
+  scale_fill_manual(values = colors) +
   labs(title = "Histogram liczności gatunków",
        x = "Gatunek",
        y = "Liczba albumów") +
-  theme(axis.text.x = element_text(hjust = 0.5, size = 10, color = "black"), 
+  theme(axis.text.x = element_text(hjust = 0.5, color = "black"), 
         axis.title.x = element_text(margin = margin(t = 10)), 
-        axis.text.y = element_text(size = 10, color = "black"),
-        plot.title = element_text(hjust = 0.5, size = 14, face = "bold")) + 
-  guides(fill = "none") 
+        axis.text.y = element_text(color = "black"),
+        plot.title = element_text(hjust = 0.5)) + 
+  guides(fill = "none") + 
+  geom_text(aes(label = Count), vjust = -0.5) 
 ```
 Jak widzimy na wykresie, najliczniejszą grupę spośród wszystkich gatunków ujętych w zestawieniu, stanowią albumy rockowe. Ich liczebność przewyższa ponad dwukrotnie drugi najliczniejszy gatunek - metal. Najrzadziej w rankingu występują "krążki" zaliczane do techno i dance, czyli elektronicznej muzyki tancznej.
 
+\subsection{Najlepiej ocenani wykonawcy}
 Kolejny ciekawy wniosek wysuwa się, jeśli policzymy unikalne wartości dla zbioru zawierającego artystów albumów zawartych w rankingu. Okazuje się, że jest ich jedynie 2090. A zatem istnieją wykonawcy, których dyskografie szczególnie przypadły do gustu użytkownikom serwisu. Musieli bowiem stworzyć co najmniej dwa albumy, które znalazły się w tym zestawieniu. Żeby sprawdzić, którzy artyści należą do grona "ulubionych", policzyliśmy liczbę wystąpień każdego z nich, przyporządkowaliśmy te wartości do konkretnych twórców i posortowaliśmy nasz zbiór po liczbie wystąpień w kolejności malejącej. Poniżej znajduje się zestawienie dziesięciu najlepiej ocenianych artystów.
-```{r, echo=FALSE}
-library("ggpattern")
+```{r, echo=FALSE, dev="cairo_pdf", fig.width=8, fig.height=5, fig.align='center'}
 filtered_data <- rym %>%
   filter(`Artist Name` != "Various Artists")
 
@@ -344,32 +380,33 @@ ggplot(artist_counts, aes(x = reorder(`Artist Name`, Count), y = Count)) +
   geom_bar_pattern(
     stat = "identity",
     aes(pattern = "stripe"),
-    fill = "skyblue",
-    color = "pink",
-    pattern_fill = "pink",
+    fill = "steelblue",
+    color = "black",
+    pattern_fill = "lightgray",
     pattern_angle = 45,
     pattern_density = 0.2,
-    pattern_spacing = 0.03 ) +
-  geom_text(aes(label = Count), color = "black", size = 4, hjust = -0.2) +
+    pattern_spacing = 0.03,   
+  ) +
+  geom_text(aes(label = Count), color = "black", hjust = -0.2) +
   coord_flip() +
   labs(
     title = "10 najlepiej ocenianych artystów",
     x = "Nazwa artysty",
     y = "Liczba albumów"
   ) +
-  theme_minimal() +
+  theme_solarized() +
   theme(
-    panel.background = element_rect(fill = "snow"),
-    panel.grid.major.x = element_blank(),
-    panel.grid.major.y = element_blank(),
-    axis.text.y = element_text(size = 10),
-    axis.text.x = element_text(size = 10),
-    legend.position = "none")
+    plot.title = element_text(hjust = 0.5),
+    plot.margin = margin(1, 1, 1, 1),
+    legend.position = "none" 
+  ) 
 
 ```
 
 
-```{r,echo=FALSE}
+Jak możemy zauważyć na wykresie, najczęściej powtarzającym się arystą w naszym rankingu jest amerykański jazzman, Miles Davis. Aż siedemnaście albumów z jego dyskografii zostało zakwalifikowanych do czołówki światowej muzyki. Na drugim miejscu uplasował się John Coltrane, z czternastoma albumami. Coltrane i Miles często ze sobą wspólpracowali. Stworzyli razem sześć albumów kooperacyjnych osadzonych w gatunku jazz. Gatunek ten jest najczęściej występującym w tym zestawieniu. Jego przedstawicielami, oprócz czołowej dwójki są jeszcze: Pharoah Sanders, Herbie Hancock oraz twórcy muzyki filmowej --- John Williams i Ennio Morricone. W najlepszej dziesiątce znalazło się jeszcze trzech reprezentantów muzyki rockowej --- Bob Dylan, The Beatles i The Fall, a także pojedyczny twórca bluesowy, Tom Waits.
+
+```{r,echo=FALSE, dev="cairo_pdf", fig.align='center', fig.width=10, fig.height=6}
 filtered_data <- rym %>%
   filter(!is.na(Years) & !is.na(`Average Rating`))  # Użycie backticków dla nazw kolumn ze spacjami
 
@@ -382,14 +419,9 @@ ggplot(filtered_data, aes(x = Years, y = as.numeric(`Average Rating`))) +
     y = "Średnia ocena",
     fill = "Liczba albumów"
   ) +
-  theme_minimal() +
   theme(
-    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
-    axis.title = element_text(size = 14),
-    axis.text = element_text(size = 12),
-    legend.title = element_text(size = 12),
-    legend.text = element_text(size = 10),
-    panel.grid.major = element_blank(),  # Usunięcie siatki dla czystszej wizualizacji
+    plot.title = element_text(hjust = 0.5),
+    panel.grid.major = element_blank(),  
     panel.grid.minor = element_blank()
   ) +
   scale_x_continuous(
@@ -402,7 +434,7 @@ ggplot(filtered_data, aes(x = Years, y = as.numeric(`Average Rating`))) +
 Heatmapa przedstawia zależność między rokiem wydania a średnią ocen. Z łatwością jesteśmy w stanie zauważyć zagęszczenie ilości albumów w okolicach lat siedemdziesiątych i przełomu XX wieku. Również w tych latach mamy największe zagęszczenie albumów o średniej ocenie oscylującej w okolicach 3.8. Jesteśmy w stanie zauważyć znacznie odbiegającą ilość albumów o wysokiej ocenie w latach 70-90, to tutaj powstały jedne z najlepiej ocenianych tytułów w historii --- lata te możemy uznać za złotą erę muzki. We współczesnych latach spotykamy się ze znacznym spadkiem jakości albumów. Może to wskazywać na kryzys, do którego doszło w przemyśle muzycznym. Głównym czynnikiem takiego stanu rzeczy są gigantyczne pieniądze, które napłynęły do tej branży. W dzisiejszych czasach muzykę robi się pod "tik-toka" aby poszła w viral i przyniosła dla autora jak największe zyski. Jakość wypuszczanych utworów przeszła na drugi plan. Wykres potwierdza nam, że najwięcej cenionych dzieł muzycznych pochodzi ze złotego okresu, który miał kluczowy wpływ na rozwój kultury muzycznej. 
 
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, dev="cairo_pdf", fig.align='center', fig.width=10, fig.height=6}
 # Definicja podstawowych gatunków
 library(dplyr)
 library(tidyr)
@@ -444,11 +476,8 @@ ggplot(average_ratings_by_decade, aes(x = Decade, y = Average_Rating, color = Ge
     y = "Średnia ocena",
     color = "Gatunek"
   ) +
-  theme_minimal() +
   theme(
-    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
-    axis.title = element_text(size = 14),
-    axis.text = element_text(size = 12),
+    plot.title = element_text(hjust = 0.5),
     legend.position = "bottom"
   )
 
@@ -456,7 +485,7 @@ ggplot(average_ratings_by_decade, aes(x = Decade, y = Average_Rating, color = Ge
 ```
 Na wykresie punktowym widzimy jak radziły sobie gatunki w poszczególnych dekadach. Na tej wizualizacji również jesteśmy w stanie zauważyć złote lata muzyki o najlepszym odbiorze przypadające na okres lat 60-70 oraz na lata 90 ubiegło stulecia. Widzimy duże załamanie jakości muzyki w latach 80, które przypadły na recesję i załamanie gospodarcze w USA. Lata 90 były ostatnim dobrym okresem w muzyce. W XXI wieku możemy zobaczyć spadek jakości muzyki zakwalifikowanej do gatunków: blues, metal, rock i jazz. 
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, dev="cairo_pdf", fig.align='center', fig.width=10, fig.height=6}
 rym <- rym %>%
   rowwise() %>%
   mutate(
@@ -488,9 +517,9 @@ ggplot(best_album_per_year, aes(x = Years, y = Basic_Genres, color = Basic_Genre
     y = "Gatunek",
     color = "Gatunek"
   ) +
-  theme_minimal() +
   theme(
-    axis.text.x = element_text(angle = 45, hjust = 1),
+    axis.text.x = element_text(angle = 45, hjust = 0.5),
+    plot.title = element_text(hjust = 0.5),
     legend.position = "bottom"
   )
 ```
@@ -499,7 +528,7 @@ Wykres punktowy pokazuje najlepiej oceniane albumy z danego roku w podziale na g
 
 
 
-```{r,echo=FALSE}
+```{r,echo=FALSE, dev="cairo_pdf", fig.align='center', fig.width=10, fig.height=6}
 library(dplyr)
 library(ggplot2)
 
@@ -562,15 +591,15 @@ ggplot(final_data, aes(x = reorder(Genre, -Range))) +
     x = "Gatunek",
     y = "Rozpiętość ocen (Max - Min)"
   ) +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 0.5),
+        plot.title = element_text(hjust = 0.5)) +
   scale_color_manual(values = "red", name = "")
 
 ```
 
 Wykres przedstawia zależność między średnimi ocenami albumów a ich liczbą, w podziale na różne gatunki muzyczne. Wynika z niego, że rozpiętość ocen nie jest skorelowana z liczbą wystąpień danego gatunku. Jeśli przyjrzymy się uważnie wcześniejszemu wykresowi, będziemy w stanie wyciągnąć inną zależność --- gatunki o największej zmienności ocen charakteryzują się również najdłuższym "stażem" w naszym rankingu. Duża rozpiętość spowodowana jest zmianą dominacji gatunków na przestrzeni lat, która wynika ze zmieniających się gustów muzycznych. Długi staż rocka zawiera zarówno momenty, w których był on hegemonem, jak i te, w których zainteresowanie tym gatunkiem było praktycznie znikome. Spowodowało to dużą zmienność w ocenie, za to jego długa dominacja sprawiła, że pod względem ilości nie ma sobie równych. Metal również potwierdza nam tę tezę. Jego panowanie dało mu dużą ilość wystąpień, jednak jego popularność szybko przeminęła. Coraz mniejsza ilość albumów tego gatunku dostawała się do naszego zestawienia, nie pozwalając na obniżenie rankingu, który zdobył podczas złotych lat panowania. Drugą największą zmiennością może pochwalić się hip-hop. Wiemy, że jego dominacja przypada na okres ubiegłej dekady, jednak już od lat 80. był on z nami i osiągał wyjątkowo wysokie oceny. Co ciekawe, były to też lata, w których --- pod względem średniej ocen --- nie miał sobie równych. Jak większość gatunków w latach dwutysięcznych, jego oceny mocno się pogorszyły, jednak pokrywa się to z okresem, w którym dopiero budował swoją pozycję, a ilość albumów w zestawieniu ciągle rosła. Dzięki temu uplasował się na drugiej pozycji pod względem zmienności. Reszta gatunków również uzyskała całkiem wysoką zmienność. Jest ona wypadkową krótkiego okresem popularności i późniejszego szybkiego spadku zainteresowania, lub przeciwnie, długiej historii w rankingu.
 
-```{r,echo=FALSE}
+```{r,echo=FALSE, dev="cairo_pdf",, fig.align='center', fig.width=10, fig.height=6}
 library(dplyr)
 library(ggplot2)
 
@@ -618,18 +647,16 @@ ggplot(genre_summary_df, aes(x = reorder(Genre, -Count))) +
     x = "Gatunek",
     y = "Średnia ocena"
   ) +
-  theme_minimal() +
   theme(
-    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
-    axis.title = element_text(size = 14),
-    axis.text.x = element_text(angle = 90, hjust = 1, size = 10),  # Obrót etykiet na osi X
+    plot.title = element_text(hjust = 0.5),
+    axis.text.x = element_text(angle = 90, hjust = 1),  # Obrót etykiet na osi X
     legend.position = "top"
   )
 ```
 
 Wykres przedstawia nam zależność między średnią ocen a liczbą wystąpień dla gatunku. Analizując wykres jesteśmy w stanie jasno stwierdzić brak korelacji między tymi zmiennymi. Nakładające się na siebie lepsze i gorsze wyniki dały nam średnią w okolicach 3,8. Wynik ten zgadza się z wcześniejszym histogramem. 
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, dev="cairo_pdf", fig.align='center', fig.width=10, fig.height=6}
 xpp <- rym
 xpp$"Number of Ratings" <- as.numeric(gsub(",", "", rym$"Number of Ratings"))
 
@@ -647,11 +674,8 @@ ggplot(daxpp, aes(x = `Number of Ratings`, y = as.numeric(`Average Rating`))) +
     x = "Liczba recenzji (skala logarytmiczna)",
     y = "Średnia ocena"
   ) +
-  theme_minimal() +
   theme(
-    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
-    axis.title = element_text(size = 14),
-    axis.text = element_text(size = 12)
+    plot.title = element_text(hjust = 0.5)
   )
 
 ```
@@ -661,8 +685,8 @@ Wykres wizualizuję nam zależność między średnią ocen a liczbą recenzji z
 \section{Podsumowanie}
 Analiza danych pozyskanych z serwisu RateYourMusic.com umożliwiła nam poznanie statystyk dotyczących muzycznych albumów, i dostarczyła odpowiedzi na zadane przez nas pytania. Wygenerowanie wykresów pudełkowych i dokładne opisanie ich parametrów zapewniły konkretną bazę pod analizę rozkładów zmiennych "Years" i "Average Rating", którą następnie rozszerzyliśmy o histogramy pradopodobieństwa z nałożonymi jądrowymi estymatorami gęstości i wizualizację empirycznych dystrybuant. Następnie pochyliliśmy się nad problemem zależności między latami wydania albumów, a ich średnimi ocenami. Metoda regresji liniowej okazała się w tym przypadku mało efektywna, dzięki czemu byliśmy w stanie stwierdzić, że relacji tej nie powinniśmy rozpatrywać w kategoriach liniowości. Przeprowadzony dalej test korelacji Pearsona wykazał, że między rozważanymi zmiennymi występuje słaba ujemna korelacja. Jako możliwe przyczyny zjawiska, zaproponowaliśmy teorię o kryzysie współczesnego rynku muzycznego oraz bardziej optymistyczną wersję --- niwystarczającej próby czasu. W dalszej części przeszliśmy do analizy albumów, z uwzględnieniem zmiennej kategorycznej, w postaci gatunków muzycznych. Z bogatego i zróżnicowanego zbioru wyodrębniliśmy dziesięć najbardziej popularnych gatunków. Histogram ich liczności wykazał, że najwięcej albumów spośród najlepszych pięciu tysięcy, należy do gatunku rock, a ich liczba przewyższa ponad dwukrotnie metal, zajmujący drugą pozycję. (analiza gatunkow c.d)
 
-Na poczatku rozważań zastanawialiśmy się także, którzy artyści mogą poszczycić sie najlepiej ocenianą dyskografią. W tym celu stworzyliśmy zestawienie dziesięciu najczęściej występujących artystów w naszym zestawieniu. Okazało się, że ten zaszczytny tytuł przypadł amerykańskiemu jazzmanowi --- Miles'owi Davis'owi, który w swojej karierze wydał 60 studyjnych albumów, spośród których aż 16 znalazło się w naszym rankingu. 
+Na poczatku rozważań zastanawialiśmy się także, którzy artyści mogą poszczycić sie najlepiej ocenianą dyskografią. W tym celu stworzyliśmy zestawienie dziesięciu najczęściej występujących artystów w naszym zestawieniu. Okazało się, że ten zaszczytny tytuł przypadł amerykańskiemu jazzmanowi --- Miles'owi Davis'owi, który w swojej karierze wydał 60 studyjnych albumów, spośród których aż 16 znalazło się w naszym rankingu. Wśród czołowej dziesiatki znalazło się sześciu przedstawicieli jazzu (w tym dwóch twórców muzyki filmowej), trzech reprezentatów rocka oraz jeden wykonawca bluesa.
 
-
+\end{document}
 
 
