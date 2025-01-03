@@ -1,25 +1,3 @@
-x0 = 0
-y0 = 0
-r = 1
-n_chords = 1000
-a = sqrt(3)
-#Podejście pierwsze
-phi1=2*pi*runif(n_chords, min=0, max=1)
-phi2=2*pi*runif(n_chords, min=0, max=1)
-
-x_start=x0+r*cos(phi1)
-y_start=y0+r*sin(phi1)
-x_end=x0+r*cos(phi2)
-y_end=y0+r*sin(phi2)
-
-chord_length = sqrt((x_start - x_end)^2 + (y_start - y_end)^2)
-count_longer <- sum(chord_length > a)
-
-p1 <- count_longer / n_chords
-print(paste("Prawdopodobieństwo:", p1))
-
-#Podejście pierwsze sposób 2
-
 library(ggplot2)
 
 # Parametry 
@@ -70,10 +48,6 @@ for (i in 1:n_chords) {
                                      x_end = x, y_end = y, chord_color = chord_color))
 }
 
-# Obliczenie prawdopodobieństwa
-p1 <- count_longer / n_chords
-cat(sprintf("Prawdopodobieństwo: %.3f\n", p1))
-
 # Okrąg
 circle_points <- data.frame(
   x = r * cos(seq(0, 2 * pi, length.out = 100)),
@@ -91,6 +65,11 @@ ggplot() +
   labs(title = "Paradoks Bertranda - metoda 1", x = "X", y = "Y") +
   theme(legend.position = "none")
 
+ggsave("C:/Users/rafal/OneDrive/Dokumente/GitHub/pakiety-statystyczne/metoda1.png")
+
+# Obliczenie prawdopodobieństwa
+p1 <- count_longer / n_chords
+cat(sprintf("Prawdopodobieństwo: %.3f\n", p1))
 
 
 

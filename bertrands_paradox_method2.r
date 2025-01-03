@@ -78,6 +78,8 @@ ggplot() +
   labs(title = "Paradoks Bertranda - metoda 2", x = "X", y = "Y") +
   theme(legend.position = "none")
 
+ggsave("C:/Users/rafal/OneDrive/Dokumente/GitHub/pakiety-statystyczne/metoda2.png")
+
 p2 <- count_longer / n_chords
 cat(sprintf("Prawdopodobieństwo: %.3f\n", p2))
 
