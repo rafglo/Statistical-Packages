@@ -75,7 +75,7 @@ ggplot() +
   geom_segment(data = radius, aes(x = x_start, y = y_start, xend = x_end, yend = y_end), color = "black", size = 1.2) +
   theme_minimal() +
   coord_equal() +
-  labs(title = "Paradoks Bertranda - metoda 1", x = "X", y = "Y") +
+  labs(title = "Paradoks Bertranda - metoda 2", x = "X", y = "Y") +
   theme(legend.position = "none")
 
 p2 <- count_longer / n_chords
