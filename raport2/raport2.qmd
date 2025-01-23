@@ -1,0 +1,56 @@
+---
+title: "raport2"
+---
+
+## Quarto
+
+Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+
+```{r}
+n <- 7  # Liczba prób
+alpha <- 0.05  # Poziom istotności
+p_values <- seq(0.01, 0.99, by = 0.01)  # Prawdziwe wartości p
+num_simulations <- 1000  # Liczba symulacji
+# Funkcja do obliczania mocy testu dla danej metody (poprawiona)
+calculate_power <- function(method, p_values, n, alpha, num_simulations) {
+  power <- numeric(length(p_values))  # Wektor mocy
+  
+  for (i in seq_along(p_values)) {
+    p <- p_values[i]
+    rejections <- 0  # Licznik odrzuceń H0
+    
+    for (j in 1:num_simulations) {
+      # Losowanie danych z rozkładu B(n, p)
+      successes <- rbinom(1, size = n, prob = p)
+      
+      # Wyznaczenie przedziału ufności
+      ci <- BinomCI(successes, n, conf.level = 1 - alpha, method = method)
+      
+      # Odrzucenie H0 tylko jeśli dolna granica CI > 0.5
+      if (ci[1] > 0.5) {
+        rejections <- rejections + 1
+      }
+    }
+    
+    # Moc testu
+    power[i] <- rejections / num_simulations
+  }
+  
+  return(power)
+}
+
+# Obliczanie mocy testu dla trzech metod
+power_results <- lapply(methods, calculate_power, p_values = p_values, n = n, 
+                        alpha = alpha, num_simulations = num_simulations)
+
+# Wizualizacja wyników
+plot(p_values, power_results[[1]], type = "l", col = "red", lwd = 2,
+     xlab = "Prawdziwa wartość p", ylab = "Moc testu",
+     main = "Funkcja mocy dla różnych testów (H1: p > 0.5)",
+     ylim = c(0, 1))
+lines(p_values, power_results[[2]], col = "blue", lwd = 2)
+lines(p_values, power_results[[3]], col = "green", lwd = 2)
+legend("bottomright", legend = methods, col = c("red", "blue", "green"), lwd = 2)
+
+
+```
