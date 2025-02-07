@@ -1,4 +1,27 @@
-.cell-output {
-  background-color: lightgreen;
-  border-radius: 4px;
-}
+dane czyste -> treningowe i testowe -> dzialamy tylko na trenignowych -> dekompozycja na trenignowych (sezonowsc i trend i szum) -> czyste dane treingowe -> dopasowanie modelu -> predykcja -> cos dopasowanego do czystych danych treningowych -> powrot do danych testowych -> odwrocenie procesu dekompozycji -> dodanie trenud i sezonowosci -> dostajemy wtedy dane odpowiadajace testowym -> porownanie
+
+lub wykonanie podzialu  na treningowe i testowe po procesie dekompozycji i zrobienie predykcji dla danych wyczyszczonych (potem ewentualnie dodanie trendu i sezonowosci zeby wrocic do orginalnej formy)
+
+
+Pytanie 1:
+Czy zrobienie (opcjonalnej) prognozy moze ewenutalnie podwyzszyc wynik w razie ewentualnych brakow, czy stanowi tylko dodatek do aktywnosci?
+
+Jesli odpowiedz na pierwsze pytanie jest nie, to moze pani zignorowac dalsza czesc.
+
+Pytanie 2:
+
+Metoda 1: Czy najpierw dzielimy dane oryginalne na treningowe i testowe. Następnie zostawiamy dane testowe w spokoju i zajmujemhy sie tylko treningowymi. Czyli na danych trenignowych wykonujemy dekompozycje, modelowanie i prognoze. W ten sposob otrzymujemy prognoze dla danych wyczyszczonych. I czy w tym momencie nalezy odwrocic proces dekompozycji, by otrzymac dane ktore bedzie mozna porownac ze zbiorem testowym?
+
+Metoda 2: Czy wykonujemy proces dekompozycji na calych danych i nastepnie dzielimy dane na trenignowe i testowe, wykonujemy modelowanie i prognoze, dzieki czemu dostajemy prognoze dla danych wyczyszczonych, którą mozemy od razu porownac ze zbiorem testowym. Pozniej ewentualnie mozemy odwrocic proces dekompozycji zeby dostac oryginalna forme szeregu. 
+
+
+Metoda 3: Najpierw dazielimy dane na trenignowe i testowe. I zostawiamy oba zbiory w spokoju. Wykonujemy caly proces analizy (dekompozycja, modelowanie). Dzieki temu dostajemy postac modelu. I teraz ten model dopasowujemy do danych trenignowych, robimy prognoze metoda forecast i porownujemy wynik ze zbiorem testowym.
+
+Pytanie 2:
+Czy zrobienie (opcjonalnej) prognozy moze ewenutalnie podwyzszyc wynik w razie ewentualnych brakow, czy stanowi tylko dodatek do aktywnosci?
+
+Pytanie 3: Czy trzeba probowac roznych metod (transformacje Boxa-Coxa, Yeo-Johnsona) w celu poradzenia sobie ze zmienna wariancja? Czy mozna przeprowadzic analize na danych ze zmienna wariancja, pomimo niespelnionego zalozenia modelu ARMA i napisac we wnioskach, ze tak naprawde model nie dziala?
+
+
+
+
