@@ -7,50 +7,6 @@ title: "raport2"
 Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
 
 ```{r}
-library(DescTools)
-
-n <- 35  # liczba prób (można zmieniać)
-alpha <- 0.05  # poziom istotności
-p_values <- seq(0, 1, length.out = 100)  # przedział wartości p
-B <- 1000  # liczba symulacji
-method_list <- c("wilson", "clopper-pearson", "jeffreys")  # Lista metod
-
-# Funkcja obliczająca moc testu dla danego p i metody
-power_test <- function(p, method) {
-  rejections <- 0
-  for (i in 1:B) {
-    S <- rbinom(1, n, p)  # Losujemy S ~ B(n, p)
-    ci <- BinomCI(S, n, conf.level = 1 - 2*alpha, method = method)
-    if (ci[1]>0.5) {  # Sprawdzamy dolną granicę przedziału
-      rejections <- rejections + 1
-    }
-  }
-  return(rejections / B)
-}
-
-# Obliczanie funkcji mocy dla różnych metod
-df <- data.frame()
-for (method in method_list) {
-  power_values <- sapply(p_values, power_test, method = method)
-  df <- rbind(df, data.frame(p = p_values, power = power_values, method = method))
-}
-
-
-# Wykres funkcji mocy
-library(ggplot2)
-ggplot(df, aes(x = p, y = power, color = method)) +
-  geom_line(linewidth = 1) +
-  labs(x = "p", y = "Moc testu", title = "Funkcja mocy dla różnych metod") +
-  theme_minimal()
-
-
-
-```
-
-```         
-```
-
-```{r}
 wilson_lower_bound <- function(x, n, alpha = 0.05) {
   p_hat <- x / n
   z <- qnorm(1 - alpha)
@@ -92,9 +48,8 @@ power_function <- function(n = 7, alpha = 0.05, p_values = seq(0.4, 0.9, length.
 ```{r}
 n <- 7
 alpha <- 0.05
-p_values <- seq(0, 0.9, length.out = 100)
+p_values <- seq(0, 1, length.out = 100)
 
-# Obliczenie funkcji mocy dla różnych metod
 test_methods <- c("wilson", "clopper-pearson", "jeffreys")
 colors <- c("blue", "green", "red")
 
@@ -111,9 +66,8 @@ abline(h = 0.05, lty = 2, col = "black")
 ```{r}
 n <- 35
 alpha <- 0.05
-p_values <- seq(0, 0.9, length.out = 100)
+p_values <- seq(0, 1, length.out = 100)
 
-# Obliczenie funkcji mocy dla różnych metod
 test_methods <- c("wilson", "clopper-pearson", "jeffreys")
 colors <- c("blue", "green", "red")
 
@@ -131,9 +85,8 @@ abline(h = 0.05, lty = 2, col = "black")
 ```{r}
 n <- 250
 alpha <- 0.05
-p_values <- seq(0, 0.9, length.out = 100)
+p_values <- seq(0, 1, length.out = 100)
 
-# Obliczenie funkcji mocy dla różnych metod
 test_methods <- c("wilson", "clopper-pearson", "jeffreys")
 colors <- c("blue", "green", "red")
 
